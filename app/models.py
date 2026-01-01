@@ -12,14 +12,15 @@ db = SQLAlchemy()
 class KnsbPlayer(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     fide: Mapped[int] = mapped_column(Integer, ForeignKey("fide.id"))
-    full_name: Mapped[str]
+    name: Mapped[str]
     title: Mapped[str]
-    federation: Mapped[str]
+    fed: Mapped[str]
     birthyear: Mapped[int]
     sex: Mapped[str]
+    start_date: Mapped[datetime.date]
 
     def asdict(self) -> dict[str, str | int]:
-        return asdict(self)
+        return asdict(self) | {"date": self.start_date.isoformat()}
 
 
 @dataclass(init=False)
@@ -32,6 +33,7 @@ class KnsbRating(db.Model):
     rapid_games: Mapped[int]
     blitz_rating: Mapped[int]
     blitz_games: Mapped[int]
+    junior_rating: Mapped[int]
 
     def asdict(self) -> dict[str, str | int]:
         return asdict(self) | {"date": self.date.isoformat()}
@@ -40,9 +42,9 @@ class KnsbRating(db.Model):
 @dataclass(init=False)
 class FidePlayer(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    full_name: Mapped[str]
+    name: Mapped[str]
     title: Mapped[str]
-    federation: Mapped[str]
+    fed: Mapped[str]
     birthyear: Mapped[int]
     sex: Mapped[str]
 
