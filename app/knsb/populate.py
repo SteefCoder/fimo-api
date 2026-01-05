@@ -142,7 +142,7 @@ def get_list(url: str) -> dict[str, pd.DataFrame]:
 
 def build_list(players: pd.DataFrame, metrics: pd.DataFrame) -> pd.DataFrame:
     def make_name(p):
-        name = f"{p.achternaam}, {p.voornaam} ({p.voorletters})"
+        name = f"{p.achternaam}, {p.voornaam}"
         if p.tussenvoegsels:
             return f"{p.tussenvoegsels} " + name
         else:
