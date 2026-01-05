@@ -10,8 +10,8 @@ db = SQLAlchemy()
 
 @dataclass(init=False)
 class KnsbPlayer(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    fide: Mapped[int] = mapped_column(Integer, ForeignKey("fide.id"))
+    knsb_id: Mapped[int] = mapped_column(primary_key=True)
+    fide_id: Mapped[int] = mapped_column(Integer, ForeignKey("fide.id"))
     name: Mapped[str]
     title: Mapped[str]
     fed: Mapped[str]
