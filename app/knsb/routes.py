@@ -1,11 +1,21 @@
 from . import bp
 
-from app.models import KnsbPlayer, db
+from app.models import KnsbPlayer, KnsbRating, db
 
-from sqlalchemy import select
+from sqlalchemy import select, Select
+
+
+def execute(query: Select):
+    return [x._tuple()[0].asdict() for x in db.session.execute(query).all()]
 
 
 @bp.route('/players')
 def players():
     query = select(KnsbPlayer).limit(10)
-    return [x._tuple()[0].asdict() for x in db.session.execute(query).all()]
+    return execute(query)
+
+
+@bp.route('/ratings')
+def ratings():
+    query = select(KnsbRating).limit(10)
+    return execute(query)
