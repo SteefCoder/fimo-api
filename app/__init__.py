@@ -14,6 +14,9 @@ def create_app(config_class=Config):
     from app.knsb import bp as knsb_bp
     app.register_blueprint(knsb_bp, url_prefix='/knsb')
 
+    from app.fide import bp as fide_bp
+    app.register_blueprint(fide_bp, url_prefix='/fide')
+
     from app.models import db
     db.init_app(app)
 
