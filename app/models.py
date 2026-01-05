@@ -50,7 +50,7 @@ class FidePlayer(db.Model):
     fed: Mapped[str]
     birthyear: Mapped[int]
     sex: Mapped[str]
-    active: bool
+    active: Mapped[bool]
 
     def asdict(self) -> dict[str, str | int]:
         return asdict(self)
