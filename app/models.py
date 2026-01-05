@@ -20,7 +20,7 @@ class KnsbPlayer(db.Model):
     start_date: Mapped[datetime.date]
 
     def asdict(self) -> dict[str, str | int]:
-        return asdict(self) | {"date": self.start_date.isoformat()}
+        return asdict(self) | {"start_date": self.start_date.isoformat()}
 
 
 @dataclass(init=False)
