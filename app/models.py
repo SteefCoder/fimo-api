@@ -25,7 +25,7 @@ class KnsbPlayer(db.Model):
 
 @dataclass(init=False)
 class KnsbRating(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
+    knsb_id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[datetime.date] = mapped_column(primary_key=True)
     standard_rating: Mapped[int]
     standard_games: Mapped[int]
@@ -34,6 +34,7 @@ class KnsbRating(db.Model):
     blitz_rating: Mapped[int]
     blitz_games: Mapped[int]
     junior_rating: Mapped[int]
+    junior_games: Mapped[int]
 
     def asdict(self) -> dict[str, str | int]:
         return asdict(self) | {"date": self.date.isoformat()}
@@ -41,7 +42,7 @@ class KnsbRating(db.Model):
 
 @dataclass(init=False)
 class FidePlayer(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
+    fide_id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     title: Mapped[str]
     fed: Mapped[str]
@@ -54,7 +55,7 @@ class FidePlayer(db.Model):
 
 @dataclass(init=False)
 class FideRating(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
+    fide_id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[datetime.date] = mapped_column(primary_key=True)
     standard_rating: Mapped[int]
     standard_k: Mapped[int]
