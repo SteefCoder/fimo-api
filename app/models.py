@@ -45,9 +45,12 @@ class FidePlayer(db.Model):
     fide_id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str]
     title: Mapped[str]
+    woman_title: Mapped[str]
+    other_titles: Mapped[str]
     fed: Mapped[str]
     birthyear: Mapped[int]
     sex: Mapped[str]
+    active: bool
 
     def asdict(self) -> dict[str, str | int]:
         return asdict(self)
