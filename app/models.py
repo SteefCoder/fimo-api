@@ -61,10 +61,13 @@ class FideRating(db.Model):
     fide_id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[datetime.date] = mapped_column(primary_key=True)
     standard_rating: Mapped[int]
+    standard_games: Mapped[int]
     standard_k: Mapped[int]
     rapid_rating: Mapped[int]
+    rapid_games: Mapped[int]
     rapid_k: Mapped[int]
     blitz_rating: Mapped[int]
+    blitz_games: Mapped[int]
     blitz_k: Mapped[int]
 
     def asdict(self) -> dict[str, str | int]:

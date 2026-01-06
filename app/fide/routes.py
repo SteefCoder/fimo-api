@@ -1,6 +1,6 @@
 from . import bp
 
-from app.models import FidePlayer, db
+from app.models import FidePlayer, FideRating, db
 
 from sqlalchemy import select, Select
 
@@ -12,4 +12,10 @@ def execute(query: Select):
 @bp.route('/players')
 def players():
     query = select(FidePlayer).limit(10)
+    return execute(query)
+
+
+@bp.route('/ratings')
+def ratings():
+    query = select(FideRating).limit(10)
     return execute(query)
