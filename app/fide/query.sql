@@ -36,3 +36,7 @@ FROM (
 LEFT OUTER JOIN fide_standard as S on S.ID = T.ID AND S.Date = D.Date
 LEFT OUTER JOIN fide_rapid as R on R.ID = T.ID AND R.Date = D.Date
 LEFT OUTER JOIN fide_blitz as B on B.ID = T.ID AND B.Date = D.Date;
+
+DROP TABLE fide_standard;
+DROP TABLE fide_rapid;
+DROP TABLE fide_blitz;
