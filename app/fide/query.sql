@@ -1,3 +1,5 @@
+-- slow af
+
 CREATE TABLE IF NOT EXISTS fide_rating (
     fide_id INTEGER,
     date TEXT,
@@ -41,6 +43,3 @@ WHERE S.Date IS NOT NULL;
 DROP TABLE fide_standard;
 DROP TABLE fide_rapid;
 DROP TABLE fide_blitz;
-
--- A lot of space is left over, so I will just clean it up
-VACUUM;
