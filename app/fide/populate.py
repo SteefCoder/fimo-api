@@ -29,9 +29,11 @@ def insert_fide_player_legacy(con: sqlite3.Connection):
 
 
 def insert_temp_fide_rating(con, url: str, temp_table_name: str, date: datetime.date):
+    widths = [15, 61, 4, 4, 5, 5, 15, 4, 6, 4, 3, 6, 5]
+
     rating_column = date.strftime("%b%y").upper()
     total_size = 0
-    with pd.read_fwf(url, compression='zip', chunksize=10_000) as reader:
+    with pd.read_fwf(url, compression='zip', chunksize=10_000, widths=widths) as reader:
         for chunk in reader:
             chunk.rename(columns={"ID Number": "ID", rating_column: "Rating"}, inplace=True)
             chunk.drop_duplicates()
