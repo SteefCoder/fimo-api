@@ -46,12 +46,9 @@ def insert_temp_fide_rating(con, url: str, temp_table_name: str, date: datetime.
 
 
 def insert_fide_rating(con: sqlite3.Connection):
-    try:
-        existing_records = con.execute("SELECT DISTINCT Date FROM fide_blitz;").fetchall()
-        existing_records = [x[0] for x in existing_records]
-        print(existing_records)
-    except:
-        existing_records = []
+    existing_records = con.execute("SELECT DISTINCT Date FROM fide_rating;").fetchall()
+    existing_records = [x[0] for x in existing_records]
+    print(existing_records)
     
     today = datetime.date.today()
     first_record = datetime.date(2015, 2, 1)
