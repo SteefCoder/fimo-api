@@ -176,15 +176,15 @@ def create_knsb_player():
 
 def insert_knsb_rating(con: sqlite3.Connection):
     # load the entire archive, do this only once
-    df = load_knsb_rating_archive()
-    df.to_sql('knsb_rating', con, if_exists='replace')
+    # df = load_knsb_rating_archive()
+    # df.to_sql('knsb_rating', con, if_exists='replace')
 
     # when updating, just use this
-    #date = datetime.date.today().replace(day=1)
-    #df = load_knsb_rating(date)
-    #if df is None:
-    #    return
-    #df.to_sql('knsb_rating', con, if_exists='append')
+    date = datetime.date(2025, 12, 1)
+    df = load_knsb_rating(date)
+    if df is None:
+        return
+    df.to_sql('knsb_rating', con, if_exists='append')
 
 
 def insert_knsb_player(con: sqlite3.Connection):
