@@ -31,13 +31,13 @@ def insert_fide_player_legacy(con: sqlite3.Connection):
 def insert_temp_fide_rating(con, url: str, temp_table_name: str, date: datetime.date):
     rating_column = date.strftime("%b%y").upper()
     total_size = 0
-    with pd.read_fwf(url, compression='zip', chunksize=50_000) as reader:
+    with pd.read_fwf(url, compression='zip', chunksize=10_000) as reader:
         for chunk in reader:
             chunk.rename(columns={"ID Number": "ID", rating_column: "Rating"}, inplace=True)
             chunk.drop_duplicates()
             chunk.set_index('ID', inplace=True)
             chunk["Date"] = date.isoformat()
-            chunk.to_sql(temp_table_name, con, if_exists='append')
+            chunk.to_sql(temp_table_name, con, if_exists='append', method=None)
             total_size += len(chunk)
 
     print(f"Inserted records of {date.isoformat()} into {temp_table_name}! ({total_size} records)")
