@@ -63,9 +63,6 @@ def insert_fide_rating(con: sqlite3.Connection):
             insert_temp_fide_rating(con, url.format("rapid"), "fide_rapid", date)
             insert_temp_fide_rating(con, url.format("blitz"), "fide_blitz", date)
 
-        if year == 2024:
-            return
-
 
 def main():
     con = sqlite3.connect('instance/database.db')
