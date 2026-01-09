@@ -187,9 +187,9 @@ def bereken_lpr(partijen: list[Partij]) -> float:
     nt = len(scores)
     x = rct + 400 * (2*wt/nt - 1)
     for _ in range(4):
-        z = [7*(x - r)/4000 for r in ratings]
+        z = [7*(x - r)/(2000 * math.sqrt(2)) for r in ratings]
         S = wt - nt/2 - sum(math.erf(i) for i in z)/2
-        Sp = - 7/(4000*math.sqrt(math.pi)) * sum(math.exp(-i**2) for i in z)
+        Sp = - 7/(2000*math.sqrt(2*math.pi)) * sum(math.exp(-i**2) for i in z)
         x -= S / Sp
     return x
 
@@ -219,7 +219,7 @@ def bereken_k_senior(rating: int, nv: float) -> float:
     
 
 def bereken_we(rv: int) -> float:
-    return 1/2 + math.erf(7*rv/4000)/2
+    return 1/2 + math.erf(7*rv/(2000*math.sqrt(2)))/2
 
 
 def bereken_totale_ratingverandering(speler: Speler, partijen: list[Partij]) -> float:
@@ -252,19 +252,20 @@ def bereken_totale_ratingverandering(speler: Speler, partijen: list[Partij]) -> 
         we = bereken_we(speler_rating - tegenstander_rating)
         rtt += k * (partij.resultaat.value - we)
 
+        print("Speler", speler_rating, k)
         print(tegenstander_rating, tflags, partij.resultaat.value - we, k * (partij.resultaat.value - we))
     
     return rtt
 
 def test():
-    vandaag = datetime.date.today()
+    vandaag = datetime.date(2025, 10, 10)
     start = time.time()
 
-    s = Speler(knsb_id=8789033)
+    s = Speler(8789033)
     partijen = [
-        Partij(s, Speler(8313910), Resultaat.REMISE, vandaag, PartijType.RAPID),
-        Partij(s, Speler(8547638), Resultaat.WINST, vandaag, PartijType.RAPID),
-        Partij(s, Speler(fide_id=100013), Resultaat.VERLIES, vandaag, PartijType.RAPID)
+        Partij(s, Speler(9024389), Resultaat.WINST, vandaag),
+        Partij(s, Speler(6041695), Resultaat.WINST, vandaag),
+        Partij(s, Speler(9013972), Resultaat.WINST, vandaag)
     ]
     print(bereken_totale_ratingverandering(s, partijen))
     
