@@ -64,3 +64,12 @@ class PartijResultaat:
     wwe: float
     k: float
     delta: float
+
+
+@dataclass(frozen=True)
+class BerekeningsResultaat:
+    nieuwe_rating: int
+    oude_rating: RatingResultaat
+    partijen: list[PartijResultaat | None]
+    delta: int
+    bonus: int

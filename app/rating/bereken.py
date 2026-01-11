@@ -1,12 +1,10 @@
-from domein import Partij, PartijType, RatingContext
-from regels.bonus import bepaal_ratingbonus
-from regels.geldende_rating import bepaal_speler_rating
-from regels.lpr import bereken_lpr, limiteer_door_lpr
-from regels.ratingverandering import bereken_ratingverandering
+from domein import BerekeningsResultaat, Partij, PartijType, RatingContext
+from regels import (bepaal_ratingbonus, bepaal_speler_rating, bereken_lpr,
+                    bereken_ratingverandering, limiteer_door_lpr)
 from speler import Speler
 
 
-def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Partij]) -> int:
+def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Partij]):
     # werkt ook als de partijen list leeg is
     if not all(p.ctx.partijtype == partijen[0].ctx.partijtype for p in partijen):
         raise ValueError("Alle partijen moeten dezelfde partijtype hebben!")
@@ -20,7 +18,7 @@ def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Par
     for partij in partijen:
         partij.ctx.lpr = lpr.rating
         resultaten.append(bereken_ratingverandering(partij))
-    delta = round(sum((r.k * r.wwe for r in resultaten), start=0))
+    delta = round(sum((r.delta for r in resultaten), start=0))
 
     # dit is lastig, want wat als deze berekening gebeurt op de eerste van de maand?
     # dan is de huidige periode ook de te berekenen periode
@@ -35,7 +33,16 @@ def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Par
     
     nieuwe_rating = limiteer_door_lpr(nieuwe_rating, recente_rating.rating, lpr.rating, delta)
 
-    bonus = bepaal_ratingbonus(speler, ctx)
-    nieuwe_rating = min(1750, nieuwe_rating + bonus)
+    if nieuwe_rating < 1750:
+        bonus = min(bepaal_ratingbonus(speler, ctx), 1750 - nieuwe_rating)
+        nieuwe_rating += bonus
+    else:
+        bonus = 0
 
-    return nieuwe_rating
+    return BerekeningsResultaat(
+        nieuwe_rating,
+        recente_rating,
+        resultaten,
+        delta,
+        bonus
+    )
