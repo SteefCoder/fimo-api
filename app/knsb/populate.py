@@ -5,10 +5,10 @@ import os
 import sqlite3
 import zipfile
 
-from bs4 import BeautifulSoup
 import dotenv
 import pandas as pd
 import requests
+from bs4 import BeautifulSoup
 
 dotenv.load_dotenv()
 
