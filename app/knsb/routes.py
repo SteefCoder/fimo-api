@@ -1,8 +1,8 @@
-from . import bp
+from sqlalchemy import Select, select
 
 from app.models import KnsbPlayer, KnsbRating, db
 
-from sqlalchemy import select, Select
+from . import bp
 
 
 def execute(query: Select):
