@@ -1,0 +1,41 @@
+from domein import Partij, PartijType, RatingContext
+from regels.bonus import bepaal_ratingbonus
+from regels.geldende_rating import bepaal_speler_rating
+from regels.lpr import bereken_lpr, limiteer_door_lpr
+from regels.ratingverandering import bereken_ratingverandering
+from speler import Speler
+
+
+def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Partij]) -> int:
+    # werkt ook als de partijen list leeg is
+    if not all(p.ctx.partijtype == partijen[0].ctx.partijtype for p in partijen):
+        raise ValueError("Alle partijen moeten dezelfde partijtype hebben!")
+    
+    if not all(p.speler == speler for p in partijen):
+        raise ValueError("Alle partijen moeten dezelfde speler hebben!")
+
+    lpr = bereken_lpr(partijen)
+
+    resultaten = []
+    for partij in partijen:
+        partij.ctx.lpr = lpr.rating
+        resultaten.append(bereken_ratingverandering(partij))
+    delta = round(sum((r.k * r.wwe for r in resultaten), start=0))
+
+    # dit is lastig, want wat als deze berekening gebeurt op de eerste van de maand?
+    # dan is de huidige periode ook de te berekenen periode
+    recente_rating = bepaal_speler_rating(speler, ctx)
+
+    nieuwe_rating = recente_rating.rating + delta
+
+    if ctx.partijtype == PartijType.KLASSIEK:
+        nieuwe_rating = max(1200, nieuwe_rating)
+    else:
+        nieuwe_rating = max(400, nieuwe_rating)
+    
+    nieuwe_rating = limiteer_door_lpr(nieuwe_rating, recente_rating.rating, lpr.rating, delta)
+
+    bonus = bepaal_ratingbonus(speler, ctx)
+    nieuwe_rating = min(1750, nieuwe_rating + bonus)
+
+    return nieuwe_rating
