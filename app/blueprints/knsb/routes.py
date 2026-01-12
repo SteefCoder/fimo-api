@@ -1,12 +1,14 @@
+from flask import request
 from sqlalchemy import Select, select
 
 from app.models import KnsbPlayer, KnsbRating, db
+from app.rating import bereken_nieuwe_rating
 
 from . import bp
 
 
 def execute(query: Select):
-    return [x._tuple()[0].asdict() for x in db.session.execute(query).all()]
+    return [x.asdict() for x in db.session.execute(query).scalars()]
 
 
 @bp.route('/players')

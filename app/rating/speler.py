@@ -1,4 +1,3 @@
-import datetime
 from functools import cache, cached_property
 
 from periode import RatingPeriode

@@ -1,0 +1,1 @@
+from bereken import bereken_nieuwe_rating
