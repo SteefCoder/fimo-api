@@ -17,10 +17,10 @@ class KnsbPlayer(db.Model):
     fed: Mapped[str]
     birthyear: Mapped[int]
     sex: Mapped[str]
-    start_date: Mapped[datetime.date]
+    register_date: Mapped[datetime.date]
 
     def asdict(self) -> dict[str, str | int]:
-        return asdict(self) | {"start_date": self.start_date.isoformat()}
+        return asdict(self) | {"register_date": self.register_date.isoformat()}
 
 
 @dataclass(init=False)
