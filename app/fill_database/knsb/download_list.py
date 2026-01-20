@@ -83,6 +83,7 @@ def combine_rating_old(rating_lists: dict[str, pd.DataFrame]) -> pd.DataFrame:
     # Old KNSB rating is equivalent to the new standard rating.
     # Rapid and blitz don't exist yet, so those are all NULL.
     return pd.DataFrame(dict(
+        title=df['title'],
         standard_rating=df['rating'],
         standard_games=df['games'],
         rapid_rating=pd.Series(pd.NA, dtype=Int),
@@ -106,6 +107,7 @@ def combine_rating_new(rating_lists: dict[str, pd.DataFrame]) -> pd.DataFrame:
     # For the newer lists, there is no junior rating anymore,
     # so those are all NULL.
     return pd.DataFrame(dict(
+        title=standard_df['title'],
         standard_rating=standard_df['rating'],
         standard_games=standard_df['games'],
         rapid_rating=rapid_df['rating'],

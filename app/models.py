@@ -27,6 +27,7 @@ class KnsbPlayer(db.Model):
 class KnsbRating(db.Model):
     knsb_id: Mapped[int] = mapped_column(primary_key=True)
     date: Mapped[datetime.date] = mapped_column(primary_key=True)
+    title: Mapped[str]
     standard_rating: Mapped[int]
     standard_games: Mapped[int]
     rapid_rating: Mapped[int]
