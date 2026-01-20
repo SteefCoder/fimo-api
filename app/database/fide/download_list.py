@@ -50,7 +50,7 @@ def read_rating_zip(url: str, date: datetime.date) -> pd.DataFrame:
         title=df['Tit'],
         woman_title=df['WTit'],
         other_titles=df['OTit'],
-        rating=df[rating_column],
+        rating=df[rating_column].astype(Int),
         games=df['Gms'].astype(Int),
         k=df['K'].astype(Int),
         active=~df['Flag'].str.contains('i', regex=False, na=False)
@@ -60,16 +60,11 @@ def read_rating_zip(url: str, date: datetime.date) -> pd.DataFrame:
 
 
 def combine_ratings(standard: pd.DataFrame, rapid: pd.DataFrame, blitz: pd.DataFrame) -> pd.DataFrame:
-    df = standard.assign(
-        rapid_rating=rapid['rating'],
-        rapid_games=rapid['games'],
-        rapid_k=rapid['k'],
-        blitz_rating=blitz['rating'],
-        blitz_games=blitz['games'],
-        blitz_k=blitz['k']
-    )
-    df.rename(columns={'rating': 'standard_rating', 'games': 'standard_games', 'k': 'standard_k'}, inplace=True)
-    return df
+    sdf = standard.rename(columns={'rating': 'standard_rating', 'games': 'standard_games', 'k': 'standard_k'})
+    rdf = rapid.rename(columns={'rating': 'rapid_rating', 'games': 'rapid_games', 'k': 'rapid_k'})
+    bdf = blitz.rename(columns={'rating': 'blitz_rating', 'games': 'blitz_games', 'k': 'blitz_k'})
+
+    return sdf.combine_first(rdf).combine_first(bdf)
 
 
 def download_ratings(date: datetime.date) -> pd.DataFrame:
