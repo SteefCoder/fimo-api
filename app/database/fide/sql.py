@@ -3,7 +3,8 @@ import sqlite3
 
 from dateutil.rrule import MONTHLY, rrule
 from download_list import download_ratings, read_legacy_format_players
-from meta import rating_exists_meta, write_player_meta, write_rating_meta
+from meta import (rating_exists_meta, remove_rating_meta, write_player_meta,
+                  write_rating_meta)
 
 
 def refresh_fide_player(con: sqlite3.Connection) -> None:
@@ -18,7 +19,24 @@ def refresh_fide_player(con: sqlite3.Connection) -> None:
     write_player_meta(df)
 
 
-def fill_fide_rating(con: sqlite3.Connection, start_date: datetime.date | None = None) -> None:
+def delete_player_rating(con: sqlite3.Connection, date: datetime.date) -> int:
+    count_query = "SELECT COUNT(*) FROM fide_rating WHERE date = ?;"
+    delete_query = "DELETE FROM fide_rating WHERE date = ?;"
+
+    count = con.execute(count_query, [date.isoformat()]).fetchone()[0]
+    con.execute(delete_query, [date.isoformat()])
+    con.commit()
+
+    remove_rating_meta(date)
+
+    return count
+
+
+def fill_fide_rating(
+    con: sqlite3.Connection,
+    start_date: datetime.date | None = None,
+    force_refresh: bool = False
+) -> None:
     """
     Fills the `fide_rating` table.
     For staying up-to-date, use `update_fide_rating`.
@@ -38,7 +56,10 @@ def fill_fide_rating(con: sqlite3.Connection, start_date: datetime.date | None =
         date = period.date()
 
         if rating_exists_meta(date):
-            continue
+            if force_refresh:
+                delete_player_rating(con, date)
+            else:
+                continue
 
         ratings = download_ratings(date)
         ratings.to_sql('fide_rating', con, if_exists='append')

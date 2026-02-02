@@ -72,3 +72,16 @@ def rating_exists_meta(date: datetime.date) -> bool:
             return False
         
         return date.isoformat() in {x['date'] for x in meta['fide-rating']['lists']}
+
+
+def remove_rating_meta(date: datetime.date) -> bool:
+    with open_meta('w') as meta:
+        if not 'fide-rating' in meta or not 'lists' in meta['fide-rating']:
+            return False
+        
+        for i, l in meta['fide-rating']['lists']:
+            if l['date'] == date.isoformat():
+                meta['fide-rating']['lists'].pop(i)
+                return True
+            
+        return False
