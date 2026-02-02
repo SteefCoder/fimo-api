@@ -1,9 +1,9 @@
 import datetime
-from dateutil.rrule import rrule, MONTHLY
 import sqlite3
 
-from download_list import read_legacy_format_players, download_ratings
-from meta import write_player_meta, write_rating_meta, rating_exists_meta
+from dateutil.rrule import MONTHLY, rrule
+from download_list import download_ratings, read_legacy_format_players
+from meta import rating_exists_meta, write_player_meta, write_rating_meta
 
 
 def refresh_fide_player(con: sqlite3.Connection) -> None:
@@ -20,8 +20,8 @@ def refresh_fide_player(con: sqlite3.Connection) -> None:
 
 def fill_fide_rating(con: sqlite3.Connection, start_date: datetime.date | None = None) -> None:
     """
-    Fills the `fide_rating` table. Replaces any existing table.
-    Run once, then use `update_fide_rating` to keep up-to-date.
+    Fills the `fide_rating` table.
+    For staying up-to-date, use `update_fide_rating`.
 
     It's a lot of lists to go through from the first record, so instead
     we can start from `start_date` and incrementally add lists when we feel like it. 

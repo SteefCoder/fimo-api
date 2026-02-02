@@ -1,7 +1,7 @@
 import datetime
 import sqlite3
 
-from download_list import load_knsb_rating, load_full_rating_archive
+from download_list import load_full_rating_archive, load_knsb_rating
 from ratingviewer_list import load_knsb_player
 
 

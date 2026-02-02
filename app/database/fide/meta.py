@@ -1,10 +1,9 @@
-from contextlib import contextmanager
 import datetime
 import json
 import pathlib
+from contextlib import contextmanager
 
 import pandas as pd
-
 
 meta_file = pathlib.Path.cwd() / 'instance' / 'meta.json'
 
