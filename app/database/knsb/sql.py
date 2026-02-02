@@ -1,9 +1,9 @@
 import datetime
 import sqlite3
 
-from .download_list import get_download_urls, load_knsb_rating
 from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
-                  write_rating_meta)
+                    write_rating_meta)
+from .download_list import get_download_urls, load_knsb_rating
 from .ratingviewer_list import load_knsb_player
 
 

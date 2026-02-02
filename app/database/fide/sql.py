@@ -2,9 +2,10 @@ import datetime
 import sqlite3
 
 from dateutil.rrule import MONTHLY, rrule
-from .download_list import download_ratings, read_legacy_format_players
+
 from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
-                  write_rating_meta)
+                    write_rating_meta)
+from .download_list import download_ratings, read_legacy_format_players
 
 
 def refresh_fide_player(con: sqlite3.Connection) -> None:
