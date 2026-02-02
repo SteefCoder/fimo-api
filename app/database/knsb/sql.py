@@ -49,7 +49,7 @@ def fill_knsb_rating(
     skip_dates = existing_ratings()
 
     for date, date_urls in urls.items():
-        if (start_date and date < start_date) or (not force_refresh and date in skip_dates):
+        if start_date and date < start_date:
             continue
 
         if date in skip_dates:
