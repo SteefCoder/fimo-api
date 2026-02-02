@@ -2,8 +2,8 @@ import datetime
 import sqlite3
 
 from dateutil.rrule import MONTHLY, rrule
-from download_list import download_ratings, read_legacy_format_players
-from meta import (rating_exists_meta, remove_rating_meta, write_player_meta,
+from .download_list import download_ratings, read_legacy_format_players
+from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
                   write_rating_meta)
 
 
@@ -16,7 +16,7 @@ def refresh_fide_player(con: sqlite3.Connection) -> None:
     df.to_sql('fide_player', con, if_exists='replace')
 
     # Add list information to meta file.
-    write_player_meta(df)
+    write_player_meta(df, 'fide')
 
 
 def delete_player_rating(con: sqlite3.Connection, date: datetime.date) -> int:
@@ -27,7 +27,7 @@ def delete_player_rating(con: sqlite3.Connection, date: datetime.date) -> int:
     con.execute(delete_query, [date.isoformat()])
     con.commit()
 
-    remove_rating_meta(date)
+    remove_rating_meta(date, 'fide')
 
     return count
 
@@ -49,6 +49,7 @@ def fill_fide_rating(
     first_record = datetime.date(2015, 2, 1)
 
     start = start_date if start_date and start_date >= first_record else first_record
+    skip_dates = existing_ratings('fide')
 
     # Iterate over every month from start to today
     dates = list(rrule(MONTHLY, dtstart=start, until=today))
@@ -57,32 +58,35 @@ def fill_fide_rating(
         if start_date and date < start_date:
             continue
 
-        if rating_exists_meta(date):
-            if force_refresh:
-                delete_player_rating(con, date)
-            else:
+        if date in skip_dates:
+            if not force_refresh:
                 continue
+            delete_player_rating(con, date)
 
         ratings = download_ratings(date)
         ratings.to_sql('fide_rating', con, if_exists='append')
+        write_rating_meta(ratings, date, 'fide')
 
-        write_rating_meta(ratings, date)
 
-
-def update_fide_rating(con: sqlite3.Connection) -> None:
+def update_fide_rating(con: sqlite3.Connection, force_refresh: bool = False) -> None:
     """
     Updates the `fide_player` table. Adds to any existing table.
     Run once a month.
     """
     today = datetime.date.today().replace(day=1)
+    if today in existing_ratings('fide'):
+        if not force_refresh:
+            return
+        delete_player_rating(con, today)
+
     ratings = download_ratings(today)
     ratings.to_sql('fide_rating', con, if_exists='append')
-    write_rating_meta(ratings, today)
+    write_rating_meta(ratings, today, 'fide')
 
 
 def main():
     con = sqlite3.connect('instance/database.db')
-    update_fide_rating(con)
+    update_fide_rating(con, force_refresh=True)
 
 
 if __name__ == '__main__':
