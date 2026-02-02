@@ -1,8 +1,9 @@
 import datetime
 import sqlite3
 
-from download_list import load_full_rating_archive, load_knsb_rating
+from download_list import load_knsb_rating, get_download_urls
 from ratingviewer_list import load_knsb_player
+from meta import existing_ratings, write_player_meta, write_rating_meta
 
 
 def refresh_knsb_player(con: sqlite3.Connection) -> None:
@@ -14,8 +15,14 @@ def refresh_knsb_player(con: sqlite3.Connection) -> None:
     df = load_knsb_player()
     df.to_sql('knsb_player', con, if_exists='replace')
 
+    write_player_meta(df)
 
-def fill_knsb_rating(con: sqlite3.Connection, start_date: datetime.date | None = None) -> None:
+
+def fill_knsb_rating(
+    con: sqlite3.Connection,
+    start_date: datetime.date | None = None,
+    force_refresh: bool = False
+) -> None:
     """
     Fills the `knsb_rating` table.
     For staying up-to-date, use `update_knsb_rating`.
@@ -23,8 +30,20 @@ def fill_knsb_rating(con: sqlite3.Connection, start_date: datetime.date | None =
     It's a lot of lists to go through from the first record, so instead
     we can start from `start_date` and incrementally add lists when we feel like it. 
     """
-    df = load_full_rating_archive(start_date)
-    df.to_sql('knsb_rating', con, if_exists='append')
+
+    urls = get_download_urls()
+    skip_dates = existing_ratings()
+
+    for date, date_urls in urls.items():
+        if (start_date and date < start_date) or (not force_refresh and date in skip_dates):
+            continue
+
+        df = load_knsb_rating(date, date_urls)
+        if df is None:
+            continue
+
+        df.to_sql('knsb_rating', con, if_exists='append')
+        write_rating_meta(df, date)
 
 
 def update_knsb_rating(con: sqlite3.Connection) -> None:
@@ -32,8 +51,11 @@ def update_knsb_rating(con: sqlite3.Connection) -> None:
     Updates the `knsb_player` table. Adds to any existing table.
     Run once a month.
     """
-    df = load_knsb_rating(datetime.date.today().replace(day=1))
+    date = datetime.date.today().replace(day=1)
+    df = load_knsb_rating(date)
     if df is None:
         return
 
     df.to_sql('knsb_rating', con, if_exists='append')
+
+    write_rating_meta(df, date)

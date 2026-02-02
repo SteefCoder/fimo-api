@@ -134,7 +134,7 @@ def combine_rating(rating_lists: dict[str, pd.DataFrame], date: datetime.date) -
     return df
 
 
-def load_knsb_rating(date: datetime.date) -> pd.DataFrame | None:
+def load_knsb_rating(date: datetime.date, date_urls: dict[str, str] | None = None) -> pd.DataFrame | None:
     """
     Loads the full rating list for a specific date. Note that this involves getting (scraping)
     the entire list of download urls. For loading all ratings lists, see `load_full_rating_archive`.
@@ -142,16 +142,20 @@ def load_knsb_rating(date: datetime.date) -> pd.DataFrame | None:
     if date.day != 1:
         raise ValueError("Date must have day=1")
 
-    urls = get_download_urls()
-    date_urls = urls.get(date, None)
-    if date_urls is None:
-        return
+    if not date_urls:
+        urls = get_download_urls()
+        date_urls = urls.get(date, None)
+        if date_urls is None:
+            return
     
     rating_lists = {rating_type: read_rating_zip(url) for rating_type, url in date_urls.items()}
     return combine_rating(rating_lists, date)
 
 
-def load_full_rating_archive(start_date: datetime.date | None = None) -> pd.DataFrame:
+def load_full_rating_archive(
+    start_date: datetime.date | None = None,
+    skip_dates: list[datetime.date] | None = None
+) -> pd.DataFrame:
     """
     Downloads all available rating lists from the schaakbond site.
     These lists generally go about two years back.
@@ -168,6 +172,9 @@ def load_full_rating_archive(start_date: datetime.date | None = None) -> pd.Data
     dfs = []
     for date, date_urls in urls.items():
         if start_date and date < start_date:
+            continue
+
+        if skip_dates and date in skip_dates:
             continue
 
         rating_lists = {rating_type: read_rating_zip(url) for rating_type, url in date_urls.items()}
