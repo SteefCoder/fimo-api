@@ -15,13 +15,16 @@ def refresh_knsb_player(con: sqlite3.Connection) -> None:
     df.to_sql('knsb_player', con, if_exists='replace')
 
 
-def fill_knsb_rating(con: sqlite3.Connection) -> None:
+def fill_knsb_rating(con: sqlite3.Connection, start_date: datetime.date | None = None) -> None:
     """
-    Fills the `knsb_rating` table. Replaces any existing table.
-    Run once, then use `update_knsb_rating` to keep up-to-date.
+    Fills the `knsb_rating` table.
+    For staying up-to-date, use `update_knsb_rating`.
+
+    It's a lot of lists to go through from the first record, so instead
+    we can start from `start_date` and incrementally add lists when we feel like it. 
     """
-    df = load_full_rating_archive()
-    df.to_sql('knsb_rating', con, if_exists='replace')
+    df = load_full_rating_archive(start_date)
+    df.to_sql('knsb_rating', con, if_exists='append')
 
 
 def update_knsb_rating(con: sqlite3.Connection) -> None:

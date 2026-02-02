@@ -151,7 +151,7 @@ def load_knsb_rating(date: datetime.date) -> pd.DataFrame | None:
     return combine_rating(rating_lists, date)
 
 
-def load_full_rating_archive() -> pd.DataFrame:
+def load_full_rating_archive(start_date: datetime.date | None = None) -> pd.DataFrame:
     """
     Downloads all available rating lists from the schaakbond site.
     These lists generally go about two years back.
@@ -159,12 +159,17 @@ def load_full_rating_archive() -> pd.DataFrame:
 
     Preferrably only do once, then use `load_knsb_rating` to keep up-to-date.
 
-    Note that the (knsb_id) index is not unique anymore.
+    Note that the (knsb_id) index is not unique anymore. Instead the `knsb_id` + `date` are unique.
+
+    We can start from `start_date` instead of loading everything at once.
     """
     urls = get_download_urls()
 
     dfs = []
     for date, date_urls in urls.items():
+        if start_date and date < start_date:
+            continue
+
         rating_lists = {rating_type: read_rating_zip(url) for rating_type, url in date_urls.items()}
         df = combine_rating(rating_lists, date)
         dfs.append(df)
