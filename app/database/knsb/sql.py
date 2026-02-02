@@ -2,7 +2,8 @@ import datetime
 import sqlite3
 
 from download_list import get_download_urls, load_knsb_rating
-from meta import existing_ratings, write_player_meta, write_rating_meta
+from meta import (existing_ratings, remove_rating_meta, write_player_meta,
+                  write_rating_meta)
 from ratingviewer_list import load_knsb_player
 
 
@@ -16,6 +17,19 @@ def refresh_knsb_player(con: sqlite3.Connection) -> None:
     df.to_sql('knsb_player', con, if_exists='replace')
 
     write_player_meta(df)
+
+
+def delete_player_rating(con: sqlite3.Connection, date: datetime.date) -> int:
+    count_query = "SELECT COUNT(*) FROM knsb_rating WHERE date = ?;"
+    delete_query = "DELETE FROM knsb_rating WHERE date = ?;"
+
+    count = con.execute(count_query, [date.isoformat()]).fetchone()[0]
+    con.execute(delete_query, [date.isoformat()])
+    con.commit()
+
+    remove_rating_meta(date)
+
+    return count
 
 
 def fill_knsb_rating(
@@ -37,6 +51,12 @@ def fill_knsb_rating(
     for date, date_urls in urls.items():
         if (start_date and date < start_date) or (not force_refresh and date in skip_dates):
             continue
+
+        if date in skip_dates:
+            if force_refresh:
+                delete_player_rating(con, date)
+            else:
+                continue
 
         df = load_knsb_rating(date, date_urls)
         if df is None:

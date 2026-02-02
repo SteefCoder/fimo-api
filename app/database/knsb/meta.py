@@ -70,3 +70,16 @@ def existing_ratings() -> list[datetime.date]:
             return []
         
         return [datetime.date.fromisoformat(x['date']) for x in meta['knsb-rating']['lists']]
+
+
+def remove_rating_meta(date: datetime.date) -> bool:
+    with open_meta('w') as meta:
+        if not 'knsb-rating' in meta or not 'lists' in meta['knsb-rating']:
+            return False
+        
+        for i, l in meta['knsb-rating']['lists']:
+            if l['date'] == date.isoformat():
+                meta['knsb-rating']['lists'].pop(i)
+                return True
+            
+        return False
