@@ -1,9 +1,9 @@
 import datetime
 import sqlite3
 
-from download_list import load_knsb_rating, get_download_urls
-from ratingviewer_list import load_knsb_player
+from download_list import get_download_urls, load_knsb_rating
 from meta import existing_ratings, write_player_meta, write_rating_meta
+from ratingviewer_list import load_knsb_player
 
 
 def refresh_knsb_player(con: sqlite3.Connection) -> None:
