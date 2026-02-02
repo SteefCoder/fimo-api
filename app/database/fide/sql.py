@@ -54,6 +54,8 @@ def fill_fide_rating(
     dates = list(rrule(MONTHLY, dtstart=start, until=today))
     for period in reversed(dates):
         date = period.date()
+        if start_date and date < start_date:
+            continue
 
         if rating_exists_meta(date):
             if force_refresh:
