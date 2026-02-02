@@ -55,6 +55,7 @@ def write_rating_meta(df: pd.DataFrame, date: datetime.date) -> None:
 
         meta['fide-rating']['lists'].append({
             'date': date,
+            'updated-at': today_iso(),
             'records': len(df),
             'inactive': (~df['active']).sum(),
             'standard': (~df['standard'].isna()).sum(),
