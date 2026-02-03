@@ -3,8 +3,8 @@ import sqlite3
 
 from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
                     write_rating_meta)
-from .download_list import get_download_urls, load_knsb_rating
-from .ratingviewer_list import load_knsb_player
+from .download_list import get_download_urls, load_knsb_rating, load_knsb_player
+# from .ratingviewer_list import load_knsb_player
 
 
 def refresh_knsb_player(con: sqlite3.Connection) -> None:
@@ -13,9 +13,13 @@ def refresh_knsb_player(con: sqlite3.Connection) -> None:
     Run once a month.
     """
     # TODO - also use the download list for optimal coverage.
-    df = load_knsb_player()
-    df.to_sql('knsb_player', con, if_exists='replace')
 
+    date = datetime.date.today().replace(day=1)
+    df = load_knsb_player(date)
+    if df is None:
+        raise Exception("Uhmm not found")
+    
+    df.to_sql('knsb_player', con, if_exists='replace')
     write_player_meta(df, 'knsb')
 
 
@@ -79,3 +83,13 @@ def update_knsb_rating(con: sqlite3.Connection) -> None:
     df.to_sql('knsb_rating', con, if_exists='append')
 
     write_rating_meta(df, date, 'knsb')
+
+
+def main():
+    con = sqlite3.connect("instance/database.db")
+    # fill_knsb_rating(con, datetime.date(2026, 1, 1))
+    refresh_knsb_player(con)
+
+
+if __name__ == '__main__':
+    main()

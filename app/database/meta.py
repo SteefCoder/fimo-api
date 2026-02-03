@@ -29,19 +29,12 @@ def today_iso() -> str:
 
 
 def write_player_meta(df: pd.DataFrame, source: str) -> None:
-    unrated = sum(
-        df['standard_rating'].isna() &
-        df['rapid_rating'].isna() &
-        df['blitz_rating'].isna()
-    )
-
     key = f'{source}-player'
     inactive = {'inactive': (~df['active']).sum()} if source == 'fide' else {}
     with open_meta('w') as meta:
         meta[key] = {
             'records': len(df),
-            'last-updated': today_iso(),
-            'unrated': unrated
+            'last-updated': today_iso()
         } | inactive
 
 

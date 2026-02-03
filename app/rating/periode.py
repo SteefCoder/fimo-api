@@ -26,3 +26,7 @@ class RatingPeriode:
     
     def als_datum(self) -> datetime.date:
         return datetime.date(self.jaar, self.maand, 1)
+
+    @classmethod
+    def uit_iso(cls, datum: str) -> RatingPeriode:
+        return cls.uit_datum(datetime.date.fromisoformat(datum))

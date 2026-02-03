@@ -1,8 +1,8 @@
 import math
 
-from domein import Partij, PartijResultaat
-from geldende_rating import bepaal_speler_rating, bepaal_tegenstander_rating
-from k_factor import bereken_k
+from ..domein import Partij, PartijResultaat
+from .geldende_rating import bepaal_speler_rating, bepaal_tegenstander_rating
+from .k_factor import bereken_k
 
 
 def bereken_we(rv: int) -> float:
@@ -23,4 +23,4 @@ def bereken_ratingverandering(partij: Partij) -> PartijResultaat | None:
     wwe = partij.resultaat.value - we
     delta = k * (partij.resultaat.value - we)
     
-    return PartijResultaat(speler.bron, tegenstander.bron, wwe, k, delta)
+    return PartijResultaat(speler, tegenstander, wwe, k, delta)

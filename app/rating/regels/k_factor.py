@@ -1,9 +1,9 @@
 import datetime
 import math
 
-from domein import RatingResultaat
-from periode import RatingPeriode
-from speler import Speler
+from ..domein import RatingResultaat
+from ..periode import RatingPeriode
+from ..speler import Speler
 
 
 def is_jeugd(speler: Speler, periode: RatingPeriode) -> bool:

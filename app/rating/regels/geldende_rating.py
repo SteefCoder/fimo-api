@@ -1,8 +1,11 @@
-from domein import Flag, PartijType, RatingBron, RatingContext, RatingResultaat
-from lpr import bereken_tlpr
-from models import FideRating, KnsbRating
-from periode import RatingPeriode
-from speler import Speler
+from app.models import FideRating, KnsbRating
+
+from ..domein import (Flag, PartijType, RatingBron, RatingContext,
+                      RatingResultaat)
+from ..periode import RatingPeriode
+from ..speler import Speler
+
+# from .lpr import bereken_tlpr
 
 
 def bepaal_knsb_rating(knsb: KnsbRating | None, ctx: RatingContext) -> RatingResultaat | None:
@@ -88,7 +91,7 @@ def bepaal_tegenstander_rating(tegenstander: Speler, ctx: RatingContext) -> Rati
     if ctx.partijtype == PartijType.KLASSIEK:
         return
     
-    return bereken_tlpr(tegenstander)
+    # return bereken_tlpr(tegenstander)
 
 
 def bepaal_speler_rating(speler: Speler, ctx: RatingContext) -> RatingResultaat:

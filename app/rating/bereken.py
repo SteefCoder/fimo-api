@@ -1,7 +1,7 @@
-from domein import BerekeningsResultaat, Partij, PartijType, RatingContext
-from regels import (bepaal_ratingbonus, bepaal_speler_rating, bereken_lpr,
-                    bereken_ratingverandering, limiteer_door_lpr)
-from speler import Speler
+from .domein import BerekeningsResultaat, Partij, PartijType, RatingContext
+from .regels import (bepaal_ratingbonus, bepaal_speler_rating, bereken_lpr,
+                     bereken_ratingverandering, limiteer_door_lpr)
+from .speler import Speler
 
 
 def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Partij]):
@@ -44,5 +44,6 @@ def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Par
         recente_rating,
         resultaten,
         delta,
-        bonus
+        bonus,
+        lpr.rating
     )

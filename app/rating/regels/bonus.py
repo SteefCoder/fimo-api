@@ -1,5 +1,5 @@
-from domein import RatingContext
-from speler import Speler
+from ..domein import RatingContext
+from ..speler import Speler
 
 
 def bepaal_ratingbonus(speler: Speler, ctx: RatingContext) -> int:

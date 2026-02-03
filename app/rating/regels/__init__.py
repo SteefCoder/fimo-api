@@ -1,4 +1,4 @@
-from bonus import bepaal_ratingbonus
-from geldende_rating import bepaal_speler_rating
-from lpr import bereken_lpr, limiteer_door_lpr
-from ratingverandering import bereken_ratingverandering
+from .bonus import bepaal_ratingbonus
+from .geldende_rating import bepaal_speler_rating
+from .lpr import bereken_lpr, limiteer_door_lpr
+from .ratingverandering import bereken_ratingverandering

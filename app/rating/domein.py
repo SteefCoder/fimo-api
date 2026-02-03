@@ -2,8 +2,8 @@ import datetime
 from dataclasses import dataclass
 from enum import Enum, auto
 
-from periode import RatingPeriode
-from speler import Speler
+from .periode import RatingPeriode
+from .speler import Speler
 
 
 class Resultaat(Enum):
@@ -13,20 +13,20 @@ class Resultaat(Enum):
 
 
 class PartijType(Enum):
-    KLASSIEK = auto()
-    RAPID = auto()
-    BLITZ = auto()
+    KLASSIEK = "KLASSIEK"
+    RAPID = "RAPID"
+    BLITZ = "BLITZ"
 
 
-class Flag(Enum):
-    KS = auto()     # knsb klassieke rating
-    KR = auto()     # knsb rapid rating
-    KB = auto()     # knsb blitz rating
-    FS = auto()     # fide klassieke rating
-    FR = auto()     # fide rapid rating
-    FB = auto()     # fide blitz rating
-    LPR = auto()    # de lijstprestatierating
-    TLPR = auto()   # de tegenstander-lijstprestatierating
+class Flag(str, Enum):
+    KS = "knsb-standard"     # knsb klassieke rating
+    KR = "knsb-rapid"     # knsb rapid rating
+    KB = "knsb-blitz"     # knsb blitz rating
+    FS = "fide-standard"     # fide klassieke rating
+    FR = "fide-rapid"     # fide rapid rating
+    FB = "fide-blitz"     # fide blitz rating
+    LPR = "lpr"    # de lijstprestatierating
+    TLPR = "tlpr"  # de tegenstander-lijstprestatierating
 
 
 @dataclass(frozen=True)
@@ -59,8 +59,8 @@ class Partij:
 
 @dataclass(frozen=True)
 class PartijResultaat:
-    speler_bron: RatingBron
-    tegenstander_bron: RatingBron
+    speler_rating: RatingResultaat
+    tegenstander_rating: RatingResultaat
     wwe: float
     k: float
     delta: float
@@ -73,3 +73,4 @@ class BerekeningsResultaat:
     partijen: list[PartijResultaat | None]
     delta: int
     bonus: int
+    lpr: int

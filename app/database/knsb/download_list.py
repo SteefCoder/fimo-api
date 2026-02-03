@@ -150,3 +150,20 @@ def load_knsb_rating(date: datetime.date, date_urls: dict[str, str] | None = Non
     
     rating_lists = {rating_type: read_rating_zip(url) for rating_type, url in date_urls.items()}
     return combine_rating(rating_lists, date)
+
+
+def load_knsb_player(date: datetime.date) -> pd.DataFrame | None:
+    if date.day != 1:
+        raise ValueError("Date must have day=1")
+
+    urls = get_download_urls()
+    date_urls = urls.get(date, None)
+    if date_urls is None:
+        return
+        
+    df = read_rating_zip(date_urls["KLASSIEK"])[
+        ['name', 'title', 'fed', 'birthyear', 'sex']
+    ]
+    df['fide_id'] = pd.Series(pd.NA, dtype=Int)
+    df['register_date'] = pd.Series(pd.NA, dtype=str)
+    return df

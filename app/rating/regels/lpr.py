@@ -1,9 +1,9 @@
 import math
 
-from domein import Flag, Partij, RatingBron, RatingResultaat
-from geldende_rating import bepaal_tegenstander_rating
-from periode import RatingPeriode
-from speler import Speler
+from ..domein import Flag, Partij, RatingBron, RatingResultaat
+from ..periode import RatingPeriode
+from ..speler import Speler
+from .geldende_rating import bepaal_tegenstander_rating
 
 
 def bereken_tlpr(tegenstander: Speler) -> RatingResultaat | None:

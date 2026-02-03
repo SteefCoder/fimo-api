@@ -1,9 +1,10 @@
 from functools import cache, cached_property
 
-from periode import RatingPeriode
 from sqlalchemy import select
 
 from app.models import FidePlayer, FideRating, KnsbPlayer, KnsbRating, db
+
+from .periode import RatingPeriode
 
 
 class Speler:
