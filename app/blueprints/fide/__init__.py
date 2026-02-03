@@ -1,5 +1,5 @@
-from flask import Blueprint
+from fastapi import APIRouter
 
-bp = Blueprint('fide', __name__)
+router = APIRouter()
 
 from .routes import *

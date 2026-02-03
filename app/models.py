@@ -1,84 +1,82 @@
-import datetime
-from dataclasses import asdict, dataclass
+from typing import Annotated
 
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import ForeignKey, Integer
-from sqlalchemy.orm import Mapped, mapped_column
-
-db = SQLAlchemy()
+from fastapi import Depends
+from sqlmodel import Date, Field, Session, SQLModel, create_engine
 
 
-@dataclass(init=False)
-class KnsbPlayer(db.Model):
-    knsb_id: Mapped[int] = mapped_column(primary_key=True)
-    fide_id: Mapped[int] = mapped_column(Integer, ForeignKey("fide.id"))
-    name: Mapped[str]
-    title: Mapped[str]
-    fed: Mapped[str]
-    birthyear: Mapped[int]
-    sex: Mapped[str]
-    register_date: Mapped[datetime.date]
-
-    def asdict(self) -> dict[str, str | int]:
-        return asdict(self) | {"register_date": self.register_date.isoformat()}
+class KnsbPlayer(SQLModel, table=True):
+    knsb_id: int = Field(primary_key=True)
+    fide_id: int = Field(foreign_key='fide_player.fide_id')
+    name: str
+    title: str | None = None
+    fed: str
+    birthyear: int
+    sex: str
 
 
-@dataclass(init=False)
-class KnsbRating(db.Model):
-    knsb_id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[datetime.date] = mapped_column(primary_key=True)
-    title: Mapped[str]
-    standard_rating: Mapped[int]
-    standard_games: Mapped[int]
-    rapid_rating: Mapped[int]
-    rapid_games: Mapped[int]
-    blitz_rating: Mapped[int]
-    blitz_games: Mapped[int]
-    junior_rating: Mapped[int]
-    junior_games: Mapped[int]
-
-    def asdict(self) -> dict[str, str | int]:
-        return asdict(self) | {"date": self.date.isoformat()}
+class KnsbRating(SQLModel, table=True):
+    knsb_id: int = Field(primary_key=True)
+    date: Date = Field(primary_key=True)
+    title: str | None = None
+    standard_rating: int | None = None
+    standard_games: int | None = None
+    rapid_rating: int | None = None
+    rapid_games: int | None = None
+    blitz_rating: int | None = None
+    blitz_games: int | None = None
+    junior_rating: int | None = None
+    junior_games: int | None = None
 
 
-@dataclass(init=False)
-class FidePlayer(db.Model):
-    fide_id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str]
-    title: Mapped[str]
-    woman_title: Mapped[str]
-    other_titles: Mapped[str]
-    fed: Mapped[str]
-    birthyear: Mapped[int]
-    sex: Mapped[str]
-    active: Mapped[bool]
-
-    def asdict(self) -> dict[str, str | int]:
-        return asdict(self)
+class FidePlayer(SQLModel, table=True):
+    fide_id: int = Field(primary_key=True)
+    name: str
+    title: str | None = None
+    woman_title: str | None = None
+    other_titles: str | None = None
+    fed: str
+    birthyear: int
+    sex: str
+    active: bool
 
 
-@dataclass(init=False)
-class FideRating(db.Model):
-    fide_id: Mapped[int] = mapped_column(primary_key=True)
-    date: Mapped[datetime.date] = mapped_column(primary_key=True)
+class FideRating(SQLModel, table=True):
+    fide_id: int = Field(primary_key=True)
+    date: Date = Field(primary_key=True)
 
-    active: Mapped[bool]
+    active: bool
 
-    title: Mapped[str]
-    woman_title: Mapped[str]
-    other_titles: Mapped[str]
+    title: str | None = None
+    woman_title: str | None = None
+    other_titles: str | None = None
 
-    standard_rating: Mapped[int]
-    standard_games: Mapped[int]
-    standard_k: Mapped[int]
+    standard_rating: int | None = None
+    standard_games: int | None = None
+    standard_k: int | None = None
 
-    rapid_rating: Mapped[int]
-    rapid_games: Mapped[int]
-    rapid_k: Mapped[int]
+    rapid_rating: int | None = None
+    rapid_games: int | None = None
+    rapid_k: int | None = None
 
-    blitz_rating: Mapped[int]
-    blitz_games: Mapped[int]
-    blitz_k: Mapped[int]
+    blitz_rating: int | None = None
+    blitz_games: int | None = None
+    blitz_k: int | None = None
 
-    def asdict(self) -> dict[str, str | int]:
-        return asdict(self) | {"date": self.date.isoformat()}
+
+sqlite_file_name = "database.db"
+sqlite_url = f"sqlite:///{sqlite_file_name}"
+
+connect_args = {"check_same_thread": False}
+engine = create_engine(sqlite_url, connect_args=connect_args)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_session)]

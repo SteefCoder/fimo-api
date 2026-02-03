@@ -1,21 +1,17 @@
-from sqlalchemy import Select, select
+from sqlmodel import select
 
-from app.models import FidePlayer, FideRating, db
+from app.models import FidePlayer, FideRating, SessionDep
 
-from . import bp
-
-
-def execute(query: Select):
-    return [x._tuple()[0].asdict() for x in db.session.execute(query).all()]
+from . import router
 
 
-@bp.route('/players')
-def players():
+@router.get('/players', response_model=list[FidePlayer])
+def read_players(session: SessionDep):
     query = select(FidePlayer).limit(10)
-    return execute(query)
+    return session.exec(query).all()
 
 
-@bp.route('/ratings')
-def ratings():
+@router.get('/ratings', response_model=list[FideRating])
+def ratings(session: SessionDep):
     query = select(FideRating).limit(10)
-    return execute(query)
+    return session.exec(query).all()
