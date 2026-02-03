@@ -1,3 +1,3 @@
 from .bereken import bereken_nieuwe_rating
 from .domein import (Partij, PartijResultaat, PartijType, RatingContext,
-                     RatingPeriode, Resultaat, Speler)
+                     RatingPeriode, Resultaat, Speler, BerekeningsResultaat)

@@ -1,8 +1,9 @@
+from fastapi import APIRouter
 from sqlmodel import select
 
 from app.models import FidePlayer, FideRating, SessionDep
 
-from . import router
+router = APIRouter()
 
 
 @router.get('/players', response_model=list[FidePlayer])
