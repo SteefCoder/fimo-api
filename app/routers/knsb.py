@@ -12,7 +12,7 @@ class GameList(BaseModel):
     ctx: RatingContext
     partijen: list[Partij]
 
-router = APIRouter(prefix='/knsb')
+router = APIRouter(prefix='/knsb', tags=['knsb'])
 
 
 @router.get('/players', response_model=list[KnsbPlayer])
