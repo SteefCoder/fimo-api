@@ -3,7 +3,7 @@ from sqlmodel import select
 
 from app.models import FidePlayer, FideRating, SessionDep
 
-router = APIRouter()
+router = APIRouter(prefix='/fide')
 
 
 @router.get('/players', response_model=list[FidePlayer])

@@ -1,18 +1,18 @@
-import datetime
-from dataclasses import dataclass
-from enum import Enum, auto
+from enum import Enum
+
+from pydantic.dataclasses import dataclass
 
 from .periode import RatingPeriode
 from .speler import Speler
 
 
-class Resultaat(Enum):
+class Resultaat(float, Enum):
     WINST = 1.0
     REMISE = 0.5
     VERLIES = 0.0
 
 
-class PartijType(Enum):
+class PartijType(str, Enum):
     KLASSIEK = "KLASSIEK"
     RAPID = "RAPID"
     BLITZ = "BLITZ"
@@ -29,16 +29,16 @@ class Flag(str, Enum):
     TLPR = "tlpr"  # de tegenstander-lijstprestatierating
 
 
-@dataclass(frozen=True)
+@dataclass
 class RatingBron:
     bron: Flag
     periode: RatingPeriode
 
 
-@dataclass(frozen=True)
+@dataclass
 class RatingResultaat:
     rating: int
-    nv_waarde: float
+    nv_waarde: float | None
     bron: RatingBron
 
 
@@ -49,7 +49,7 @@ class RatingContext:
     lpr: int | None = None
 
 
-@dataclass(frozen=True)
+@dataclass
 class Partij:
     speler: Speler
     tegenstander: Speler
@@ -57,7 +57,7 @@ class Partij:
     ctx: RatingContext
 
 
-@dataclass(frozen=True)
+@dataclass
 class PartijResultaat:
     speler_rating: RatingResultaat
     tegenstander_rating: RatingResultaat
@@ -66,7 +66,7 @@ class PartijResultaat:
     delta: float
 
 
-@dataclass(frozen=True)
+@dataclass
 class BerekeningsResultaat:
     nieuwe_rating: int
     oude_rating: RatingResultaat

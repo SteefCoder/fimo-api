@@ -4,7 +4,11 @@ from .regels import (bepaal_ratingbonus, bepaal_speler_rating, bereken_lpr,
 from .speler import Speler
 
 
-def bereken_nieuwe_rating(speler: Speler, ctx: RatingContext, partijen: list[Partij]):
+def bereken_nieuwe_rating(
+    speler: Speler,
+    ctx: RatingContext,
+    partijen: list[Partij]
+):
     # werkt ook als de partijen list leeg is
     if not all(p.ctx.partijtype == partijen[0].ctx.partijtype for p in partijen):
         raise ValueError("Alle partijen moeten dezelfde partijtype hebben!")

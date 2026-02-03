@@ -1,10 +1,13 @@
 from typing import Annotated
+import datetime
 
 from fastapi import Depends
-from sqlmodel import Date, Field, Session, SQLModel, create_engine
+from sqlmodel import Field, Session, SQLModel, create_engine
 
 
 class KnsbPlayer(SQLModel, table=True):
+    __tablename__ = "knsb_player"
+
     knsb_id: int = Field(primary_key=True)
     fide_id: int = Field(foreign_key='fide_player.fide_id')
     name: str
@@ -15,8 +18,10 @@ class KnsbPlayer(SQLModel, table=True):
 
 
 class KnsbRating(SQLModel, table=True):
+    __tablename__ = "knsb_rating"
+
     knsb_id: int = Field(primary_key=True)
-    date: Date = Field(primary_key=True)
+    date: datetime.date = Field(primary_key=True)
     title: str | None = None
     standard_rating: int | None = None
     standard_games: int | None = None
@@ -27,8 +32,14 @@ class KnsbRating(SQLModel, table=True):
     junior_rating: int | None = None
     junior_games: int | None = None
 
+    model_config = {
+        'arbitrary_types_allowed': True
+    }
+
 
 class FidePlayer(SQLModel, table=True):
+    __tablename__ = "fide_player"
+
     fide_id: int = Field(primary_key=True)
     name: str
     title: str | None = None
@@ -41,8 +52,10 @@ class FidePlayer(SQLModel, table=True):
 
 
 class FideRating(SQLModel, table=True):
+    __tablename__ = "fide_rating"
+
     fide_id: int = Field(primary_key=True)
-    date: Date = Field(primary_key=True)
+    date: datetime.date = Field(primary_key=True)
 
     active: bool
 
@@ -63,7 +76,7 @@ class FideRating(SQLModel, table=True):
     blitz_k: int | None = None
 
 
-sqlite_file_name = "database.db"
+sqlite_file_name = "instance/database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 connect_args = {"check_same_thread": False}

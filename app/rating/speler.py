@@ -1,43 +1,49 @@
 from functools import cache, cached_property
 
-from sqlalchemy import select
+from pydantic import BaseModel
 
-from app.models import FidePlayer, FideRating, KnsbPlayer, KnsbRating, db
+from app.models import FidePlayer, FideRating, KnsbPlayer, KnsbRating, SessionDep
 
 from .periode import RatingPeriode
 
 
-class Speler:
+_session: SessionDep
+
+def set_session(session: SessionDep) -> None:
+    global _session
+    _session = session
+
+
+class Speler(BaseModel, frozen=True):
     """Een speler die vooral dingen doet die met databases te maken hebben."""
-    def __init__(self, knsb_id: int | None = None, fide_id: int | None = None) -> None:
-        assert knsb_id or fide_id
 
-        self.knsb_id = knsb_id
-        self.fide_id = fide_id
+    knsb_id: int | None = None
+    fide_id: int | None = None
 
-        if not fide_id and self.knsb:
-            self.fide_id = self.knsb.fide_id
+    def model_post_init(self, __context):
+        if not (self.knsb_id or self.fide_id):
+            raise ValueError("Player must have some sort of id provided!")
 
     @cached_property
     def knsb(self) -> KnsbPlayer | None:
         if self.knsb_id:
-            query = select(KnsbPlayer).where(KnsbPlayer.knsb_id == self.knsb_id)
-            return db.session.execute(query).scalar_one()
+            return _session.get(KnsbPlayer, self.knsb_id)
 
     @cached_property
     def fide(self) -> FidePlayer | None:
+        if not self.fide_id and self.knsb and self.knsb.fide_id:
+            return _session.get(FidePlayer, self.knsb.fide_id)
+
         if self.fide_id:
-            query = select(FidePlayer).where(FidePlayer.fide_id == self.fide_id)
-            return db.session.execute(query).scalar_one()
-    
+            return _session.get(FidePlayer, self.fide_id)
+
     @cache
     def get_knsb_rating(self, periode: RatingPeriode) -> KnsbRating | None:
         if self.knsb_id is None:
             return
         
         datum = periode.als_datum()
-        query = select(KnsbRating).where(KnsbRating.knsb_id == self.knsb_id, KnsbRating.date == datum)
-        return db.session.execute(query).scalar()
+        return _session.get(KnsbRating, (self.knsb_id, datum))
 
     @cache
     def get_fide_rating(self, periode: RatingPeriode) -> FideRating | None:
@@ -45,9 +51,8 @@ class Speler:
             return 
         
         datum = periode.als_datum()
-        query = select(FideRating).where(FideRating.fide_id == self.fide_id, FideRating.date == datum)
-        return db.session.execute(query).scalar()
-    
+        return _session.get(FideRating, (self.fide_id, datum))
+
     @cache
     def heeft_partij_gespeeld(self) -> bool:
         """Check of de speler in de afgelopen twee jaar een partij heeft

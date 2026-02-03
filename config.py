@@ -1,12 +1,7 @@
-import os
+from pydantic_settings import BaseSettings
 
-from dotenv import load_dotenv
 
-load_dotenv()
+class Settings(BaseSettings):
+    app_name: str = "FiMO API"
 
-KEY = os.environ.get("SECRET_KEY")
-assert KEY is not None
-
-class Config:
-    SECRET_KEY = KEY
-    SQLALCHEMY_DATABASE_URI = "sqlite:///database.db"
+settings = Settings()

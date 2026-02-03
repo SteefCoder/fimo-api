@@ -6,12 +6,6 @@ from ..speler import Speler
 from .geldende_rating import bepaal_tegenstander_rating
 
 
-def bereken_tlpr(tegenstander: Speler) -> RatingResultaat | None:
-    # Deze kan ik nog niet implementeren.
-    # Ik moet alle partijen van de tegenstander in een bepaald evenement hebben
-    pass
-
-
 def bereken_lpr(partijen: list[Partij]) -> RatingResultaat:
     ratings = []
     scores = []

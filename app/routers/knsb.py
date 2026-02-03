@@ -4,7 +4,7 @@ from sqlmodel import select
 
 from app.models import KnsbPlayer, KnsbRating, SessionDep
 from app.rating import (BerekeningsResultaat, Partij, RatingContext, Speler,
-                        bereken_nieuwe_rating)
+                        bereken_nieuwe_rating, set_session)
 
 
 class GameList(BaseModel):
@@ -12,7 +12,7 @@ class GameList(BaseModel):
     ctx: RatingContext
     partijen: list[Partij]
 
-router = APIRouter()
+router = APIRouter(prefix='/knsb')
 
 
 @router.get('/players', response_model=list[KnsbPlayer])
@@ -28,7 +28,8 @@ def ratings(session: SessionDep):
 
 
 @router.post('/calculate', response_model=BerekeningsResultaat)
-def calculate(game_list: GameList):
+def calculate(session: SessionDep, game_list: GameList):
+    set_session(session)
     resultaat = bereken_nieuwe_rating(
         game_list.speler,
         game_list.ctx,
