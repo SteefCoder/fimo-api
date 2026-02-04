@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from app.models import FidePlayer, FideRating, KnsbPlayer, KnsbRating, SessionDep
 
 from .periode import RatingPeriode
-
+from .exceptions import PlayerNotFoundError
 
 _session: SessionDep
 
@@ -26,17 +26,30 @@ class Speler(BaseModel, frozen=True):
 
     @cached_property
     def knsb(self) -> KnsbPlayer | None:
-        if self.knsb_id:
-            return _session.get(KnsbPlayer, self.knsb_id)
+        if not self.knsb_id:
+            return
+        
+        result = _session.get(KnsbPlayer, self.knsb_id)
+        if result:
+            return result
+            
+        raise PlayerNotFoundError(f"Player {self.knsb_id} was not found in KNSB database.")
 
     @cached_property
     def fide(self) -> FidePlayer | None:
-        if not self.fide_id and self.knsb and self.knsb.fide_id:
-            return _session.get(FidePlayer, self.knsb.fide_id)
-
         if self.fide_id:
-            return _session.get(FidePlayer, self.fide_id)
-
+            fide_id = self.fide_id
+        elif self.knsb and self.knsb.fide_id:
+            fide_id = self.knsb.fide_id
+        else:
+            return
+        
+        result = _session.get(FidePlayer, fide_id)
+        if result:
+            return result
+        
+        raise PlayerNotFoundError(f"Player {fide_id} was not found in FIDE database.")
+        
     @cache
     def get_knsb_rating(self, periode: RatingPeriode) -> KnsbRating | None:
         if self.knsb_id is None:

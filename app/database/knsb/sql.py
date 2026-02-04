@@ -87,9 +87,9 @@ def update_knsb_rating(con: sqlite3.Connection) -> None:
 
 def main():
     con = sqlite3.connect("instance/database.db")
-    # fill_knsb_rating(con, datetime.date(2026, 1, 1))
-    refresh_knsb_player(con)
-
+    fill_knsb_rating(con, datetime.date(2025, 1, 1))
+    # refresh_knsb_player(con)
+    
 
 if __name__ == '__main__':
     main()

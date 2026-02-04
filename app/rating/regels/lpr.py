@@ -3,10 +3,10 @@ import math
 from ..domein import Flag, Partij, RatingBron, RatingResultaat
 from ..periode import RatingPeriode
 from ..speler import Speler
-from .geldende_rating import bepaal_tegenstander_rating
+from .geldende_rating import bepaal_tegenstander_rating, bepaal_geldende_rating
 
 
-def bereken_lpr(partijen: list[Partij]) -> RatingResultaat:
+def bereken_lpr(partijen: list[Partij]) -> RatingResultaat | None:
     ratings = []
     scores = []
     for partij in partijen:
@@ -16,6 +16,9 @@ def bereken_lpr(partijen: list[Partij]) -> RatingResultaat:
 
         ratings.append(rating.rating)
         scores.append(partij.resultaat.value)
+
+    if len(ratings) == 0:
+        return
 
     rct = sum(ratings) / len(ratings)
     if sum(scores) == 0 or sum(scores) == len(scores):

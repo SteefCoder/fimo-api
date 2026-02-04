@@ -38,7 +38,7 @@ class RatingBron:
 @dataclass
 class RatingResultaat:
     rating: int
-    nv_waarde: float | None
+    nv_waarde: float
     bron: RatingBron
 
 
@@ -73,4 +73,4 @@ class BerekeningsResultaat:
     partijen: list[PartijResultaat | None]
     delta: int
     bonus: int
-    lpr: int
+    lpr: int | None
