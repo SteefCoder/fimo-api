@@ -51,6 +51,62 @@ def calculate_rating(session: SessionDep, game_list: GameList):
     - We willen het liefst de knsb en fide veel minder gretig opvragen uit de database
     - Wat doen we aan de herhaling van info in de request?
     - Hoe gaan we testen?
+      - Om goed te testen moet de hele setup van de ratings anders.
+    - Hoe doen we de verschillende formats (blitz, rapid en klassiek)?
+
+    Wat willen we:
+    input:
+    speler
+      - knsb_id
+      - fide_id
+    format (blitz, rapid of klassiek)
+    partijen
+      - tegenstander
+        - knsb_id
+        - fide_id
+      - datum
+      - resultaat
+
+    output:
+    nieuwe_rating
+      - rating
+      - nv_waarde (nieuwe nv_waarde)
+      - bron
+        - bron: berekend
+        - huidige periode
+    gespeelde_partijen (alleen de meegetelde)
+    delta
+    bonus
+    lpr
+    lpr-limitering
+      - gelimiteerd: bool
+      - bovengrens
+      - ondergrens
+    oude_rating
+      - rating
+      - nv_waarde
+      - bron
+        - bron (KS, FS, KB, LPR, etc.)
+        - periode
+          - maand
+          - jaar
+    partijen
+    :als de partij meetelt:
+      - partij telt mee: true
+      - tegenstander
+      - datum
+      - resultaat
+      - speler_rating (zelfde format als bovenstaand)
+      - tegenstander_rating (zelfde als bovenstaand, zonder nv_waarde?)
+      - W-We
+      - k-waarde
+      - delta
+    :als de partij niet meetelt:
+      - partij telt mee: false
+      - tegenstander
+      - datum
+      - resultaat
+      - reden
     """
     set_session(session)
     try:
