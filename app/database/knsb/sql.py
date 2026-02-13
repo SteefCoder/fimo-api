@@ -3,8 +3,8 @@ import sqlite3
 
 from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
                     write_rating_meta)
-from .download_list import get_download_urls, load_knsb_rating, load_knsb_player
-# from .ratingviewer_list import load_knsb_player
+from .download_list import (get_download_urls, load_knsb_player,
+                            load_knsb_rating)
 
 
 def refresh_knsb_player(con: sqlite3.Connection) -> None:
