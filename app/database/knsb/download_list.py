@@ -165,5 +165,4 @@ def load_knsb_player(date: datetime.date) -> pd.DataFrame | None:
         ['name', 'title', 'fed', 'birthyear', 'sex']
     ]
     df['fide_id'] = pd.Series(pd.NA, dtype=Int)
-    df['register_date'] = pd.Series(pd.NA, dtype=str)
     return df

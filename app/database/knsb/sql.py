@@ -1,10 +1,18 @@
 import datetime
+import pathlib
 import sqlite3
 
 from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
                     write_rating_meta)
 from .download_list import (get_download_urls, load_knsb_player,
                             load_knsb_rating)
+
+query_path = pathlib.Path(__file__).resolve().parent / 'fide_id_query.sql'
+
+
+def fill_player_fide_id(con: sqlite3.Connection) -> None:
+    con.executescript(query_path.open().read())
+    con.commit()
 
 
 def refresh_knsb_player(con: sqlite3.Connection) -> None:
@@ -20,6 +28,7 @@ def refresh_knsb_player(con: sqlite3.Connection) -> None:
         raise Exception("Uhmm not found")
     
     df.to_sql('knsb_player', con, if_exists='replace')
+    fill_player_fide_id(con)
     write_player_meta(df, 'knsb')
 
 
@@ -87,8 +96,8 @@ def update_knsb_rating(con: sqlite3.Connection) -> None:
 
 def main():
     con = sqlite3.connect("instance/database.db")
-    fill_knsb_rating(con, datetime.date(2025, 1, 1))
-    # refresh_knsb_player(con)
+    # fill_knsb_rating(con, datetime.date(2025, 1, 1))
+    refresh_knsb_player(con)
     
 
 if __name__ == '__main__':
