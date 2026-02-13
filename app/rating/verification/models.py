@@ -72,6 +72,7 @@ class PartijLijst(BaseModel):
         
         return self
 
+
 class RatingResultaat(BaseModel):
     rating: int
     nv_waarde: float
