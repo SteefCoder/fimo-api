@@ -30,7 +30,7 @@ def today_iso() -> str:
 
 def write_player_meta(df: pd.DataFrame, source: str) -> None:
     key = f'{source}-player'
-    inactive = {'inactive': (~df['active']).sum()} if source == 'fide' else {}
+    inactive = {'inactive': sum(~df['active'])} if source == 'fide' else {}
     with open_meta('w') as meta:
         meta[key] = {
             'records': len(df),

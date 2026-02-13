@@ -7,15 +7,16 @@ from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
                     write_rating_meta)
 from .download_list import download_ratings, read_legacy_format_players
 
+import pandas as pd
 
 def refresh_fide_player(con: sqlite3.Connection) -> None:
     """
     Refreshes and replaces the `fide_player` table.
     Run once a month.
     """
-    df = read_legacy_format_players()
-    df.to_sql('fide_player', con, if_exists='replace')
-
+    #df = read_legacy_format_players()
+    #df.to_sql('fide_player', con, if_exists='replace')
+    df = pd.read_sql('select * from fide_player', con)
     # Add list information to meta file.
     write_player_meta(df, 'fide')
 
@@ -87,7 +88,8 @@ def update_fide_rating(con: sqlite3.Connection, force_refresh: bool = False) -> 
 
 def main():
     con = sqlite3.connect('instance/database.db')
-    update_fide_rating(con, force_refresh=True)
+    refresh_fide_player(con)
+    update_fide_rating(con)
 
 
 if __name__ == '__main__':

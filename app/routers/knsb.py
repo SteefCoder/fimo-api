@@ -1,17 +1,13 @@
-from fastapi import APIRouter, HTTPException, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from typing import Annotated
+
+from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
-from app.models import KnsbPlayer, KnsbRating, SessionDep
-from app.rating import (BerekeningsResultaat, Partij, RatingContext, Speler,
-                        bereken_nieuwe_rating, set_session)
-from app.rating.exceptions import RatingError, PlayerNotFoundError
+from app.models import KnsbPlayer, KnsbRating, SessionDep, Depends, get_session
+from app.rating.db import DatabaseRepository
+from app.rating.verification import bereken_nieuwe_rating, LijstBerekening, PartijLijst, VerificationError
+from app.rating.domain.exceptions import PlayerNotFoundError
 
-class GameList(BaseModel):
-    speler: Speler
-    ctx: RatingContext
-    partijen: list[Partij]
 
 router = APIRouter(prefix='/knsb', tags=['knsb'])
 
@@ -34,8 +30,12 @@ def read_ratings(session: SessionDep):
     return session.exec(query).all()
 
 
-@router.post('/calculate', response_model=BerekeningsResultaat)
-def calculate_rating(session: SessionDep, game_list: GameList):
+@router.post(
+    '/calculate',
+    response_model=LijstBerekening,
+    dependencies=[Depends(get_session)]
+)
+def calculate_rating(session: SessionDep, lijst: PartijLijst):
     """
     Calculate the new rating of a player based on recent games played.
 
@@ -108,13 +108,10 @@ def calculate_rating(session: SessionDep, game_list: GameList):
       - resultaat
       - reden
     """
-    set_session(session)
     try:
-        resultaat = bereken_nieuwe_rating(
-            game_list.speler,
-            game_list.ctx,
-            game_list.partijen
-        )
-        return resultaat
-    except (RatingError, PlayerNotFoundError) as e:
-        raise HTTPException(400, e.args)
+        repo = DatabaseRepository(session)
+        resultaat = bereken_nieuwe_rating(lijst, repo)
+    except (PlayerNotFoundError, VerificationError) as e:
+        raise HTTPException(status_code=400, detail=e.args)
+
+    return resultaat

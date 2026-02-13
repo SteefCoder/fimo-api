@@ -6,10 +6,10 @@ from sqlmodel import Field, Session, SQLModel, create_engine
 
 
 class KnsbPlayer(SQLModel, table=True):
-    __tablename__ = "knsb_player"
+    __tablename__: str = "knsb_player"  # type: ignore
 
     knsb_id: int = Field(primary_key=True)
-    fide_id: int = Field(foreign_key='fide_player.fide_id')
+    fide_id: int = Field(index=True, foreign_key='fide_player.fide_id')
     name: str
     title: str | None = None
     fed: str
@@ -18,7 +18,7 @@ class KnsbPlayer(SQLModel, table=True):
 
 
 class KnsbRating(SQLModel, table=True):
-    __tablename__ = "knsb_rating"
+    __tablename__: str = "knsb_rating"  # type: ignore
 
     knsb_id: int = Field(primary_key=True)
     date: datetime.date = Field(primary_key=True)
@@ -38,7 +38,7 @@ class KnsbRating(SQLModel, table=True):
 
 
 class FidePlayer(SQLModel, table=True):
-    __tablename__ = "fide_player"
+    __tablename__: str = "fide_player"  # type: ignore
 
     fide_id: int = Field(primary_key=True)
     name: str
@@ -52,7 +52,7 @@ class FidePlayer(SQLModel, table=True):
 
 
 class FideRating(SQLModel, table=True):
-    __tablename__ = "fide_rating"
+    __tablename__: str = "fide_rating"  # type: ignore
 
     fide_id: int = Field(primary_key=True)
     date: datetime.date = Field(primary_key=True)

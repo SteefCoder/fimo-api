@@ -1,16 +1,13 @@
 from __future__ import annotations
 
-from typing import Annotated
 import datetime
-
-from pydantic.dataclasses import dataclass
-from pydantic import Field
+from dataclasses import dataclass
 
 
 @dataclass
 class RatingPeriode:
-    maand: Annotated[int, Field(gt=0, le=12)]
-    jaar: Annotated[int, Field(gt=1900)]
+    maand: int
+    jaar: int
 
     def __str__(self) -> str:
         return self.als_datum().isoformat()
@@ -27,9 +24,9 @@ class RatingPeriode:
     def uit_datum(cls, datum: datetime.date) -> RatingPeriode:
         return cls(datum.month, datum.year)
     
-    def als_datum(self) -> datetime.date:
-        return datetime.date(self.jaar, self.maand, 1)
-
     @classmethod
     def uit_iso(cls, datum: str) -> RatingPeriode:
         return cls.uit_datum(datetime.date.fromisoformat(datum))
+
+    def als_datum(self) -> datetime.date:
+        return datetime.date(self.jaar, self.maand, 1)
