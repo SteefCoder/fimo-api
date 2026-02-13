@@ -1,14 +1,16 @@
 from enum import Enum
+from functools import partial
 
-from dacite import from_dict, Config
+from dacite import Config, from_dict
 
 from ..domain.models import PartijLijst, Speler
 from ..repository import RatingRepository
+from .exc import VerificationError
 from .models import PartijLijst as PartijLijstIn
-from .exceptions import VerificationError
+from .models import Speler as SpelerIn
 
 
-def validate_speler(speler: Speler, repo: RatingRepository) -> Speler:
+def validate_speler(speler: SpelerIn, repo: RatingRepository) -> Speler:
     knsb_id = speler.knsb_id
     fide_id = speler.fide_id
 
@@ -29,10 +31,11 @@ def validate_speler(speler: Speler, repo: RatingRepository) -> Speler:
 
 
 def validate_partijlijst(lijst: PartijLijstIn, repo: RatingRepository) -> PartijLijst:
-    domain_lijst = from_dict(PartijLijst, lijst.model_dump(), config=Config(cast=[Enum]))
-    domain_lijst.speler = validate_speler(domain_lijst.speler, repo)
+    validate = partial(validate_speler, repo=repo)
+
+    config = Config(cast=[Enum], type_hooks={SpelerIn: validate})
+    domain_lijst = from_dict(PartijLijst, lijst.model_dump(), config=config)
     for partij in domain_lijst.partijen:
-        partij.tegenstander = validate_speler(partij.tegenstander, repo)
         if partij.tegenstander == domain_lijst.speler:
             raise VerificationError("Een speler kan niet tegen zichzelf spelen.")
     return domain_lijst

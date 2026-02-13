@@ -1,9 +1,9 @@
-from .models import PartijLijst, LijstBerekening
-from ..repository import RatingRepository
-from ..domain.regels import bereken
-from .verify import validate_partijlijst
-
 from dataclasses import asdict
+
+from ..domain.regels import bereken
+from ..repository import RatingRepository
+from .models import LijstBerekening, PartijLijst
+from .verify import validate_partijlijst
 
 
 def bereken_nieuwe_rating(lijst: PartijLijst, repo: RatingRepository) -> LijstBerekening:

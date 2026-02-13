@@ -1,5 +1,5 @@
 from ...repository import FideRating, KnsbRating, RatingRepository
-from ..exceptions import PlayerNotFoundError
+from ..exc import PlayerNotFoundError
 from ..models import (PartijType, RatingBron, RatingContext, RatingResultaat,
                       Speler)
 from .tlpr import bereken_tlpr

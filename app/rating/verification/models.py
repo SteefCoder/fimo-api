@@ -1,7 +1,10 @@
+import datetime
 from enum import Enum
-from typing import Annotated, Self, Literal
+from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
+
+from .exc import VerificationError
 
 
 class Resultaat(float, Enum):
@@ -43,6 +46,9 @@ class RatingPeriode(BaseModel):
     maand: Annotated[int, Field(gt=0, le=12)]
     jaar: Annotated[int, Field(gt=0)]
 
+    def als_datum(self) -> datetime.date:
+        return datetime.date(self.jaar, self.maand, 1)
+
 
 class Partij(BaseModel):
     tegenstander: Speler
@@ -60,9 +66,11 @@ class PartijLijst(BaseModel):
     def check_partij_data(self) -> Self:
         # check of de periode een beetje normaal is
         # check of alle data van de partijen een beetje normaal zijn
-
+        if any(self.periode.als_datum() < p.periode.als_datum()
+               for p in self.partijen):
+            raise VerificationError("Datum van partij is pas na berekendatum.")
+        
         return self
-
 
 class RatingResultaat(BaseModel):
     rating: int

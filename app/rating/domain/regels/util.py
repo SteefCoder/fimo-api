@@ -1,5 +1,5 @@
 from ...repository import RatingRepository
-from ..exceptions import PlayerNotFoundError
+from ..exc import PlayerNotFoundError
 from ..models import RatingPeriode, Speler
 
 

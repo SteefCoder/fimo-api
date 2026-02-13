@@ -3,11 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 
-from app.models import KnsbPlayer, KnsbRating, SessionDep, Depends, get_session
+from app.models import Depends, KnsbPlayer, KnsbRating, SessionDep, get_session
 from app.rating.db import DatabaseRepository
-from app.rating.verification import bereken_nieuwe_rating, LijstBerekening, PartijLijst, VerificationError
-from app.rating.domain.exceptions import PlayerNotFoundError
-
+from app.rating.domain.exc import PlayerNotFoundError
+from app.rating.verification import (LijstBerekening, PartijLijst,
+                                     VerificationError, bereken_nieuwe_rating)
 
 router = APIRouter(prefix='/knsb', tags=['knsb'])
 

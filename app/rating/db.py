@@ -1,6 +1,9 @@
-from app.models import KnsbPlayer, FidePlayer, KnsbRating, FideRating, SessionDep
-from .domain.exceptions import PlayerNotFoundError
 from sqlmodel import select
+
+from app.models import (FidePlayer, FideRating, KnsbPlayer, KnsbRating,
+                        SessionDep)
+
+from .domain.exc import PlayerNotFoundError
 from .periode import RatingPeriode
 
 
