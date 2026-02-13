@@ -50,7 +50,7 @@ class PartijLijst:
     partijen: list[Partij]
 
 
-@dataclass(frozen=True)
+@dataclass
 class RatingContext:
     partijtype: PartijType
     periode: RatingPeriode
