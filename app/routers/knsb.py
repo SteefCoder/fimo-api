@@ -38,76 +38,11 @@ def read_ratings(session: SessionDep):
 def calculate_rating(session: SessionDep, lijst: PartijLijst):
     """
     Calculate the new rating of a player based on recent games played.
-
-    Wat dingen om over na te denken:
-    - Als de datum heel ver in het verleden is (voordat er een rating record beschikbaar is)
-      gebruiken we dan de lpr of geven we een error?
-    - Wat doen we als de speler voor de knsb_id en de fide_id niet matchen?
-      Waarschijnlijk negeren?
-    - Hoe geven we aan waarom een partij niet meegeteld is?
-      - De tegenstander bestaat niet (een error geven?)
-      - De datum is in de toekomst of ver verleden
-      - We kunnen een rating niet vinden
-    - We willen het liefst de knsb en fide veel minder gretig opvragen uit de database
-    - Wat doen we aan de herhaling van info in de request?
-    - Hoe gaan we testen?
-      - Om goed te testen moet de hele setup van de ratings anders.
-    - Hoe doen we de verschillende formats (blitz, rapid en klassiek)?
-
-    Wat willen we:
-    input:
-    speler
-      - knsb_id
-      - fide_id
-    format (blitz, rapid of klassiek)
-    partijen
-      - tegenstander
-        - knsb_id
-        - fide_id
-      - datum
-      - resultaat
-
-    output:
-    nieuwe_rating
-      - rating
-      - nv_waarde (nieuwe nv_waarde)
-      - bron
-        - bron: berekend
-        - huidige periode
-    gespeelde_partijen (alleen de meegetelde)
-    delta
-    bonus
-    lpr
-    lpr-limitering
-      - gelimiteerd: bool
-      - bovengrens
-      - ondergrens
-    oude_rating
-      - rating
-      - nv_waarde
-      - bron
-        - bron (KS, FS, KB, LPR, etc.)
-        - periode
-          - maand
-          - jaar
-    partijen
-    :als de partij meetelt:
-      - partij telt mee: true
-      - tegenstander
-      - datum
-      - resultaat
-      - speler_rating (zelfde format als bovenstaand)
-      - tegenstander_rating (zelfde als bovenstaand, zonder nv_waarde?)
-      - W-We
-      - k-waarde
-      - delta
-    :als de partij niet meetelt:
-      - partij telt mee: false
-      - tegenstander
-      - datum
-      - resultaat
-      - reden
     """
+    # TODO Unit tests voor het rating berekenen.
+    # TODO Wat als de datum van de partij in de toekomst of ver verleden is?
+    # TODO Als de datum heel ver in het verleden is (voordat er een rating record beschikbaar is)
+    #  gebruiken we dan de lpr of geven we een error?
     try:
         repo = DatabaseRepository(session)
         resultaat = bereken_nieuwe_rating(lijst, repo)
