@@ -4,8 +4,6 @@ from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from .exc import VerificationError
-
 
 class Resultaat(float, Enum):
     WINST = 1.0
@@ -46,6 +44,13 @@ class RatingPeriode(BaseModel):
     maand: Annotated[int, Field(gt=0, le=12)]
     jaar: Annotated[int, Field(gt=0)]
 
+    @model_validator(mode='after')
+    def check_partij_toekomst(self) -> Self:
+        if self.als_datum() > datetime.date.today():
+            raise ValueError("Partijen in toekomstige ratingperioden kunnen niet berekend worden.")
+        
+        return self
+
     def als_datum(self) -> datetime.date:
         return datetime.date(self.jaar, self.maand, 1)
 
@@ -68,10 +73,7 @@ class PartijLijst(BaseModel):
         # check of alle data van de partijen een beetje normaal zijn
         if any(self.periode.als_datum() < p.periode.als_datum()
                for p in self.partijen):
-            raise VerificationError("Datum van partij is na berekendatum.")
-        
-        if self.periode.als_datum() > datetime.date.today():
-            raise VerificationError("Partijen in toekomstige ratingperioden kunnen niet berekend worden.")
+            raise ValueError("Datum van partij is na berekendatum.")
         
         # TODO wat doen we met data heel ver in het verleden?
 
