@@ -1,8 +1,9 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Path, HTTPException
+from fastapi import APIRouter, Query, Path, HTTPException, Depends
 from sqlmodel import select
 
+from app.rating.periode import RatingPeriode
 from app.models import FidePlayer, FideRating, SessionDep
 from app.schemas import FidePlayerResponse, FideRatingResponse
 
@@ -32,9 +33,17 @@ def get_player(session: SessionDep, fide_id: Annotated[int, Path(gt=0)]):
 
 
 @router.get('/ratings', response_model=list[FideRatingResponse])
-def read_ratings(session: SessionDep):
+def get_ratings(
+    session: SessionDep,
+    fide_id: Annotated[int, Query(gt=0)],
+    date: Annotated[RatingPeriode, Depends(RatingPeriode.uit_datum)]
+):
     """
     Get a list of rating records per date and player id.
     """
-    query = select(FideRating).limit(10)
-    return session.execute(query).all()
+    rating = session.get(FideRating, (fide_id, date.als_datum()))
+    if rating:
+        return rating
+    
+    raise HTTPException(404, f"Geen rating gevonden")
+

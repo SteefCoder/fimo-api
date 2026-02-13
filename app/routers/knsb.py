@@ -1,11 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query, Path
+from fastapi import APIRouter, HTTPException, Query, Path, Depends
 from sqlalchemy import select
 
 from app.models import KnsbPlayer, KnsbRating, SessionDep
 from app.schemas import KnsbPlayerResponse, KnsbRatingResponse
 
+from app.rating.periode import RatingPeriode
 from app.rating.db import DatabaseRepository
 from app.rating.domain.exc import PlayerNotFoundError
 from app.rating.verification import (LijstBerekening, PartijLijst,
@@ -37,13 +38,20 @@ def get_player(session: SessionDep, knsb_id: Annotated[int, Path(gt=0)]):
     raise HTTPException(404, f"Geen spelers gevonden met KNSB ID {knsb_id}.")
 
 
-@router.get('/ratings', response_model=list[KnsbRatingResponse])
-def read_ratings(session: SessionDep):
+@router.get('/ratings', response_model=KnsbRatingResponse)
+def get_ratings(
+    session: SessionDep,
+    knsb_id: Annotated[int, Query(gt=0)],
+    date: Annotated[RatingPeriode, Depends(RatingPeriode.uit_datum)]
+):
     """
     Get a list of rating records per date and player id.
     """
-    query = select(KnsbRating).limit(10)
-    return session.execute(query).scalars().all()
+    rating = session.get(KnsbRating, (knsb_id, date.als_datum()))
+    if rating:
+        return rating
+    
+    raise HTTPException(404, f"Geen rating gevonden")
 
 
 @router.post('/calculate', response_model=LijstBerekening)
