@@ -29,7 +29,7 @@ class DatabaseRepository:
     
     def get_knsb_from_fide(self, fide_id: int) -> KnsbPlayer | None:
         query = select(KnsbPlayer).where(KnsbPlayer.fide_id == fide_id)
-        return self.session.exec(query).one_or_none()
+        return self.session.execute(query).scalar_one_or_none()
 
     def get_knsb_rating(self, knsb_id: int, periode: RatingPeriode) -> KnsbRating | None:
         return self.session.get(KnsbRating, (knsb_id, periode.als_datum()))
