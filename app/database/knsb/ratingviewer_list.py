@@ -1,13 +1,10 @@
 """
 Program for automatically downloading the player lists the ratingviewer site uses.
-This list contains some players that are not in the downloadable rating list and vice versa.
-Optimally, we want to combine the two so all players are included.
 
 These lists are mostly used internally, so I'd most like to just keep to the (public) download lists.
-These are mostly for completeness (since sometimes players are missing from the download lists).
-Also these contains the FIDE ID and register date of the players, which the download lists don't.
+These contains the FIDE ID and register date of the players, which the download lists don't.
 
-They blocked it now so I'm going to have to do it the annoying way.
+I'll be retiring this one.
 """
 
 import datetime
