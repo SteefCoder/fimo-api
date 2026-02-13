@@ -69,8 +69,8 @@ class PartijLijst(BaseModel):
 
     @model_validator(mode='after')
     def check_partij_data(self) -> Self:
-        # check of de periode een beetje normaal is
         # check of alle data van de partijen een beetje normaal zijn
+        # in de detail kan deze wellicht wat specifieker?
         if any(self.periode.als_datum() < p.periode.als_datum()
                for p in self.partijen):
             raise ValueError("Datum van partij is na berekendatum.")

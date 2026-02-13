@@ -60,8 +60,8 @@ def calculate_rating(session: SessionDep, lijst: PartijLijst):
     Calculate the new rating of a player based on recent games played.
     """
     # TODO Unit tests voor het rating berekenen.
-    # TODO Wat als de datum van de partij in de toekomst of ver verleden is?
-    # TODO Als de datum heel ver in het verleden is (voordat er een rating record beschikbaar is)
+    # TODO Wat als de datum van de partij in het ver verleden is?
+    # TODO Als de berekendatum heel ver in het verleden is (voordat er een rating record beschikbaar is)
     #  gebruiken we dan de lpr of geven we een error?
     try:
         repo = DatabaseRepository(session)
