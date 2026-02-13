@@ -68,8 +68,13 @@ class PartijLijst(BaseModel):
         # check of alle data van de partijen een beetje normaal zijn
         if any(self.periode.als_datum() < p.periode.als_datum()
                for p in self.partijen):
-            raise VerificationError("Datum van partij is pas na berekendatum.")
+            raise VerificationError("Datum van partij is na berekendatum.")
         
+        if self.periode.als_datum() > datetime.date.today():
+            raise VerificationError("Partijen in toekomstige ratingperioden kunnen niet berekend worden.")
+        
+        # TODO wat doen we met data heel ver in het verleden?
+
         return self
 
 
