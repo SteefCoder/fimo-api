@@ -74,6 +74,16 @@ class FideRating(Base):
     blitz_k = Column(Integer, nullable=True)
 
 
+class SuggestPlayer(Base):
+    __tablename__ = 'suggest_player'
+
+    id = Column(Integer, primary_key=True)
+    knsb_id = Column(Integer, index=True, nullable=True)
+    fide_id = Column(Integer, index=True, nullable=True)
+    comma_name = Column(String)
+    full_name = Column(String)
+
+
 sqlite_file_name = 'instance/database.db'
 sqlite_url = f'sqlite:///{sqlite_file_name}'
 
