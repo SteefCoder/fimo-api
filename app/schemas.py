@@ -56,3 +56,10 @@ class FideRatingResponse(BaseModel):
     blitz_rating: int | None
     blitz_games: int | None
     blitz_k: int | None
+
+
+class SuggestPlayerResponse(BaseModel):
+    id: int
+    knsb_id: int
+    fide_id: int
+    name: int
