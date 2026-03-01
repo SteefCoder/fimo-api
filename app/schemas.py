@@ -1,6 +1,6 @@
 import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class KnsbPlayerResponse(BaseModel):
@@ -60,6 +60,6 @@ class FideRatingResponse(BaseModel):
 
 class SuggestPlayerResponse(BaseModel):
     id: int
-    knsb_id: int
-    fide_id: int
-    name: int
+    knsb_id: int | None
+    fide_id: int | None
+    name: str = Field(alias="comma_name")

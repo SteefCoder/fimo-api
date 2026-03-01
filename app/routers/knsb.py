@@ -3,8 +3,8 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Query, Path, Depends
 from sqlalchemy import select
 
-from app.models import KnsbPlayer, KnsbRating, SessionDep
-from app.schemas import KnsbPlayerResponse, KnsbRatingResponse
+from app.models import KnsbPlayer, KnsbRating, SessionDep, SuggestPlayer
+from app.schemas import KnsbPlayerResponse, KnsbRatingResponse, SuggestPlayerResponse
 
 from app.rating.periode import RatingPeriode
 from app.rating.db import DatabaseRepository
@@ -70,3 +70,12 @@ def calculate_rating(session: SessionDep, lijst: PartijLijst):
         raise HTTPException(status_code=400, detail=e.args)
 
     return resultaat
+
+
+@router.get('/suggest', response_model=list[SuggestPlayerResponse])
+def suggest(session: SessionDep, name: Annotated[str, Query(max_length=50)]):
+    query = select(SuggestPlayer).where(
+        SuggestPlayer.full_name.ilike(f"{name}%") |
+        SuggestPlayer.comma_name.ilike(f"{name}%")
+    ).limit(10)
+    return session.execute(query).scalars()
