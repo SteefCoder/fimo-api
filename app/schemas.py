@@ -62,4 +62,4 @@ class SuggestPlayerResponse(BaseModel):
     id: int
     knsb_id: int | None
     fide_id: int | None
-    name: str = Field(alias="comma_name")
+    name: str = Field(validation_alias="comma_name")
