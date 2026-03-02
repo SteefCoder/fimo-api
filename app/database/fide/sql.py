@@ -63,9 +63,12 @@ def fill_fide_rating(
                 continue
             delete_player_rating(con, date)
 
+        print(f"Starting download for {date}.")
         ratings = download_ratings(date)
+        print("Download finished. Inserting to database.")
         ratings.to_sql('fide_rating', con, if_exists='append')
         write_rating_meta(ratings, date, 'fide')
+        print("Done")
 
 
 def update_fide_rating(con: sqlite3.Connection, force_refresh: bool = False) -> None:
@@ -86,8 +89,9 @@ def update_fide_rating(con: sqlite3.Connection, force_refresh: bool = False) -> 
 
 def main():
     con = sqlite3.connect('instance/database.db')
-    refresh_fide_player(con)
-    update_fide_rating(con)
+    # refresh_fide_player(con)
+    # update_fide_rating(con)
+    fill_fide_rating(con, datetime.date(2026, 1, 1))
 
 
 if __name__ == '__main__':
