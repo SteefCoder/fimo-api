@@ -77,11 +77,11 @@ class FideRating(Base):
 class SuggestPlayer(Base):
     __tablename__ = 'suggest_player'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     knsb_id = Column(Integer, index=True, nullable=True)
     fide_id = Column(Integer, index=True, nullable=True)
-    comma_name = Column(String)
-    full_name = Column(String)
+    comma_name = Column(String, index=True, nullable=False)
+    full_name = Column(String, index=True, nullable=False)
 
 
 sqlite_file_name = 'instance/database.db'
