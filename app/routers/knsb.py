@@ -75,7 +75,7 @@ def calculate_rating(session: SessionDep, lijst: PartijLijst):
 @router.get('/suggest', response_model=list[SuggestPlayerResponse])
 def suggest(session: SessionDep, name: Annotated[str, Query(max_length=50)]):
     query = select(SuggestPlayer).where(
-        SuggestPlayer.full_name.ilike(f"{name}%") |
-        SuggestPlayer.comma_name.ilike(f"{name}%")
+        SuggestPlayer.full_name.startswith(name, autoescape=True) |
+        SuggestPlayer.comma_name.startswith(name, autoescape=True)
     ).limit(10)
     return session.execute(query).scalars()
