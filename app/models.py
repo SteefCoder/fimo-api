@@ -1,8 +1,8 @@
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy import create_engine, Column, Integer, String, Date, Boolean
-from sqlalchemy.orm import declarative_base, Session
+from sqlalchemy import Boolean, Column, Date, Integer, String, create_engine
+from sqlalchemy.orm import Session, declarative_base
 
 Base = declarative_base()
 

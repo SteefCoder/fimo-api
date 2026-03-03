@@ -1,16 +1,14 @@
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query, Path, Depends
+from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import select
 
 from app.models import KnsbPlayer, KnsbRating, SessionDep, SuggestPlayer
-from app.schemas import KnsbPlayerResponse, KnsbRatingResponse, SuggestPlayerResponse
-
-from app.rating.periode import RatingPeriode
-from app.rating.db import DatabaseRepository
-from app.rating.domain.exc import PlayerNotFoundError
-from app.rating.verification import (LijstBerekening, PartijLijst,
-                                     VerificationError, bereken_nieuwe_rating)
+from app.rating import (DatabaseRepository, GameList, ListCalculation,
+                        PlayerNotFoundError, RatingPeriod, VerificationError,
+                        calculate_new_rating)
+from app.schemas import (KnsbPlayerResponse, KnsbRatingResponse,
+                         SuggestPlayerResponse)
 
 router = APIRouter(prefix='/knsb', tags=['knsb'])
 
@@ -42,20 +40,20 @@ def get_player(session: SessionDep, knsb_id: Annotated[int, Path(gt=0)]):
 def get_ratings(
     session: SessionDep,
     knsb_id: Annotated[int, Query(gt=0)],
-    date: Annotated[RatingPeriode, Depends(RatingPeriode.uit_datum)]
+    date: Annotated[RatingPeriod, Depends(RatingPeriod.from_date)]
 ):
     """
     Get a list of rating records per date and player id.
     """
-    rating = session.get(KnsbRating, (knsb_id, date.als_datum()))
+    rating = session.get(KnsbRating, (knsb_id, date.as_date()))
     if rating:
         return rating
     
     raise HTTPException(404, f"Geen rating gevonden")
 
 
-@router.post('/calculate', response_model=LijstBerekening)
-def calculate_rating(session: SessionDep, lijst: PartijLijst):
+@router.post('/calculate', response_model=ListCalculation)
+def calculate_rating(session: SessionDep, game_list: GameList):
     """
     Calculate the new rating of a player based on recent games played.
     """
@@ -65,7 +63,7 @@ def calculate_rating(session: SessionDep, lijst: PartijLijst):
     #  gebruiken we dan de lpr of geven we een error?
     try:
         repo = DatabaseRepository(session)
-        resultaat = bereken_nieuwe_rating(lijst, repo)
+        resultaat = calculate_new_rating(game_list, repo)
     except (PlayerNotFoundError, VerificationError) as e:
         raise HTTPException(status_code=400, detail=e.args)
 

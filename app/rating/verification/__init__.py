@@ -1,3 +1,3 @@
-from .calculate import bereken_nieuwe_rating
+from .calculate import calculate_new_rating
 from .exc import VerificationError
-from .models import LijstBerekening, PartijLijst
+from .models import GameList, ListCalculation

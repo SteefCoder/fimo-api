@@ -3,16 +3,15 @@ from functools import partial
 
 from dacite import Config, from_dict
 
-from ..domain.models import PartijLijst, Speler
+from ..domain.models import GameList, Player
 from ..repository import RatingRepository
 from .exc import VerificationError
-from .models import PartijLijst as PartijLijstIn
-from .models import Speler as SpelerIn
+from .models import GameList as GameListIn
 
 
-def validate_speler(speler: dict[str, int], repo: RatingRepository) -> Speler:
-    knsb_id = speler.get("knsb_id")
-    fide_id = speler.get("fide_id")
+def validate_player(player: dict[str, int], repo: RatingRepository) -> Player:
+    knsb_id = player.get("knsb_id")
+    fide_id = player.get("fide_id")
 
     if knsb_id:
         knsb = repo.get_knsb(knsb_id)
@@ -27,16 +26,16 @@ def validate_speler(speler: dict[str, int], repo: RatingRepository) -> Speler:
         knsb = repo.get_knsb_from_fide(fide_id)
         if knsb:
             knsb_id = knsb.knsb_id
-        
-    return Speler(knsb_id, fide_id)
+
+    return Player(knsb_id, fide_id)
 
 
-def validate_partijlijst(lijst: PartijLijstIn, repo: RatingRepository) -> PartijLijst:
-    validate = partial(validate_speler, repo=repo)
+def validate_game_list(game_list: GameListIn, repo: RatingRepository) -> GameList:
+    validate = partial(validate_player, repo=repo)
 
-    config = Config(cast=[Enum], type_hooks={Speler: validate})
-    domain_lijst = from_dict(PartijLijst, lijst.model_dump(), config=config)
-    for partij in domain_lijst.partijen:
-        if partij.tegenstander == domain_lijst.speler:
-            raise VerificationError("Een speler kan niet tegen zichzelf spelen.")
-    return domain_lijst
+    config = Config(cast=[Enum], type_hooks={Player: validate})
+    domain_list = from_dict(GameList, game_list.model_dump(), config=config)
+    for game in domain_list.games:
+        if game.opponent == domain_list.player:
+            raise VerificationError("Een player kan niet tegen zichzelf spelen.")
+    return domain_list

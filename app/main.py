@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers import fide, knsb
 
-
 description = """
 An API to find and calculate chess ratings.
 

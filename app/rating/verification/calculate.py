@@ -1,12 +1,12 @@
 from dataclasses import asdict
 
-from ..domain.regels import bereken
+from ..domain.rules import calculate
 from ..repository import RatingRepository
-from .models import LijstBerekening, PartijLijst
-from .verify import validate_partijlijst
+from .models import GameList, ListCalculation
+from .verify import validate_game_list
 
 
-def bereken_nieuwe_rating(lijst: PartijLijst, repo: RatingRepository) -> LijstBerekening:
-    domain_lijst = validate_partijlijst(lijst, repo)
-    berekening = bereken.bereken_nieuwe_rating(domain_lijst, repo)
-    return LijstBerekening.model_validate(asdict(berekening))
+def calculate_new_rating(game_list: GameList, repo: RatingRepository) -> ListCalculation:
+    domain_list = validate_game_list(game_list, repo)
+    calculation = calculate.calculate_new_rating(domain_list, repo)
+    return ListCalculation.model_validate(asdict(calculation))

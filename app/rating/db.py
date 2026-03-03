@@ -4,7 +4,7 @@ from app.models import (FidePlayer, FideRating, KnsbPlayer, KnsbRating,
                         SessionDep)
 
 from .domain.exc import PlayerNotFoundError
-from .periode import RatingPeriode
+from .period import RatingPeriod
 
 
 class DatabaseRepository:
@@ -31,11 +31,11 @@ class DatabaseRepository:
         query = select(KnsbPlayer).where(KnsbPlayer.fide_id == fide_id)
         return self.session.execute(query).scalar_one_or_none()
 
-    def get_knsb_rating(self, knsb_id: int, periode: RatingPeriode) -> KnsbRating | None:
-        return self.session.get(KnsbRating, (knsb_id, periode.als_datum()))
+    def get_knsb_rating(self, knsb_id: int, period: RatingPeriod) -> KnsbRating | None:
+        return self.session.get(KnsbRating, (knsb_id, period.as_date()))
 
-    def get_fide_rating(self, fide_id: int, periode: RatingPeriode) -> FideRating | None:
-        return self.session.get(FideRating, (fide_id, periode.als_datum()))
+    def get_fide_rating(self, fide_id: int, period: RatingPeriod) -> FideRating | None:
+        return self.session.get(FideRating, (fide_id, period.as_date()))
 
-    def heeft_partij_gespeeld(self, knsb_id: int) -> bool:
+    def has_played_game(self, knsb_id: int) -> bool:
         return True

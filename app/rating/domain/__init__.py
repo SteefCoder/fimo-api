@@ -1,1 +1,1 @@
-from .regels.bereken import bereken_nieuwe_rating
+from .rules.calculate import calculate_new_rating
