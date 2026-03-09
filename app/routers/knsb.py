@@ -3,12 +3,11 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 from sqlalchemy import select
 
-from app.models import KnsbPlayer, KnsbRating, SessionDep, SuggestPlayer
+from app.models import KnsbPlayer, KnsbRating, SessionDep
 from app.rating import (DatabaseRepository, GameList, ListCalculation,
                         PlayerNotFoundError, RatingPeriod, VerificationError,
                         calculate_new_rating)
-from app.schemas import (KnsbPlayerResponse, KnsbRatingResponse,
-                         SuggestPlayerResponse)
+from app.schemas import KnsbPlayerResponse, KnsbRatingResponse
 
 router = APIRouter(prefix='/knsb', tags=['knsb'])
 
