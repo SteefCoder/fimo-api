@@ -68,12 +68,3 @@ def calculate_rating(session: SessionDep, game_list: GameList):
         raise HTTPException(status_code=400, detail=e.args)
 
     return resultaat
-
-
-@router.get('/suggest', response_model=list[SuggestPlayerResponse])
-def suggest(session: SessionDep, name: Annotated[str, Query(max_length=50)]):
-    query = select(SuggestPlayer).where(
-        SuggestPlayer.full_name.startswith(name, autoescape=True) |
-        SuggestPlayer.comma_name.startswith(name, autoescape=True)
-    ).limit(10)
-    return session.execute(query).scalars()

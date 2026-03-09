@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import fide, knsb
+from .routers import fide, knsb, suggest
 
 description = """
 An API to find and calculate chess ratings.
@@ -36,3 +36,4 @@ app.add_middleware(
 
 app.include_router(fide.router)
 app.include_router(knsb.router)
+app.include_router(suggest.router)
