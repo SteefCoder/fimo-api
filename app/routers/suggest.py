@@ -9,7 +9,7 @@ from app.schemas import SuggestPlayerResponse
 router = APIRouter(prefix='/suggest', tags=['suggest'])
 
 
-@router.get('/', response_model=list[SuggestPlayerResponse])
+@router.get('', response_model=list[SuggestPlayerResponse])
 def suggest(session: SessionDep, name: Annotated[str, Query(max_length=50)]):
     query = select(SuggestPlayer).where(
         SuggestPlayer.full_name.like(f"{name}%") |
