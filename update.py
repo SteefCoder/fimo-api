@@ -22,7 +22,7 @@ def main():
             update_fide_rating(con, args.force)
         if args.table in ('all', 'player'):
             print("Updating fide player...")
-            refresh_fide_player(con)
+            refresh_fide_player(con, args.force)
 
     if args.fed in ('all', 'knsb'):
         if args.table in ('all', 'rating'):
@@ -30,7 +30,7 @@ def main():
             update_knsb_rating(con, args.force)
         if args.table in ('all', 'player'):
             print("Updating knsb player...")
-            refresh_knsb_player(con)
+            refresh_knsb_player(con, args.force)
 
     print("Done.")
     
