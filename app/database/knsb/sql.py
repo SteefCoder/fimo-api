@@ -92,13 +92,3 @@ def update_knsb_rating(con: sqlite3.Connection) -> None:
     df.to_sql('knsb_rating', con, if_exists='append')
 
     write_rating_meta(df, date, 'knsb')
-
-
-def main():
-    con = sqlite3.connect("instance/database.db")
-    # fill_knsb_rating(con, datetime.date(2025, 1, 1))
-    refresh_knsb_player(con)
-    
-
-if __name__ == '__main__':
-    main()

@@ -85,14 +85,3 @@ def update_fide_rating(con: sqlite3.Connection, force_refresh: bool = False) -> 
     ratings = download_ratings(today)
     ratings.to_sql('fide_rating', con, if_exists='append')
     write_rating_meta(ratings, today, 'fide')
-
-
-def main():
-    con = sqlite3.connect('instance/database.db')
-    # refresh_fide_player(con)
-    # update_fide_rating(con)
-    fill_fide_rating(con, datetime.date(2026, 1, 1))
-
-
-if __name__ == '__main__':
-    main()
