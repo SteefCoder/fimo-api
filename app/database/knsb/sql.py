@@ -1,9 +1,8 @@
-import datetime
 import pathlib
 import sqlite3
 
-from ..meta import (existing_ratings, remove_rating_meta, write_player_meta,
-                    write_rating_meta)
+from ..meta import (RatingPeriod, existing_ratings, player_is_to_date,
+                    remove_rating_meta, write_player_meta, write_rating_meta)
 from .download_list import (get_download_urls, load_knsb_player,
                             load_knsb_rating)
 
@@ -15,15 +14,16 @@ def fill_player_fide_id(con: sqlite3.Connection) -> None:
     con.commit()
 
 
-def refresh_knsb_player(con: sqlite3.Connection) -> None:
+def refresh_knsb_player(con: sqlite3.Connection, force_refresh: bool = False) -> None:
     """
     Refreshes and replaces the `knsb_player` table.
+    If the table is already up to date, it can be forced anyway using force_refresh.
     Run once a month.
     """
-    # TODO - also use the download list for optimal coverage.
+    if player_is_to_date('knsb') and not force_refresh:
+        return
 
-    date = datetime.date.today().replace(day=1)
-    df = load_knsb_player(date)
+    df = load_knsb_player(RatingPeriod.current())
     if df is None:
         raise Exception("Uhmm not found")
     
@@ -32,22 +32,22 @@ def refresh_knsb_player(con: sqlite3.Connection) -> None:
     write_player_meta(df, 'knsb')
 
 
-def delete_player_rating(con: sqlite3.Connection, date: datetime.date) -> int:
+def delete_player_rating(con: sqlite3.Connection, period: RatingPeriod) -> int:
     count_query = "SELECT COUNT(*) FROM knsb_rating WHERE date = ?;"
     delete_query = "DELETE FROM knsb_rating WHERE date = ?;"
 
-    count = con.execute(count_query, [date.isoformat()]).fetchone()[0]
-    con.execute(delete_query, [date.isoformat()])
+    count = con.execute(count_query, [period.isoformat()]).fetchone()[0]
+    con.execute(delete_query, [period.isoformat()])
     con.commit()
 
-    remove_rating_meta(date, 'knsb')
+    remove_rating_meta(period, 'knsb')
 
     return count
 
 
 def fill_knsb_rating(
     con: sqlite3.Connection,
-    start_date: datetime.date | None = None,
+    start_period: RatingPeriod | None = None,
     force_refresh: bool = False
 ) -> None:
     """
@@ -61,34 +61,38 @@ def fill_knsb_rating(
     urls = get_download_urls()
     skip_dates = existing_ratings('knsb')
 
-    for date, date_urls in urls.items():
-        if start_date and date < start_date:
+    for period, date_urls in urls.items():
+        if start_period and period < start_period:
             continue
 
-        if date in skip_dates:
+        if period in skip_dates:
             if force_refresh:
-                delete_player_rating(con, date)
+                delete_player_rating(con, period)
             else:
                 continue
 
-        df = load_knsb_rating(date, date_urls)
+        df = load_knsb_rating(period, date_urls)
         if df is None:
             continue
 
         df.to_sql('knsb_rating', con, if_exists='append')
-        write_rating_meta(df, date, 'knsb')
+        write_rating_meta(df, period, 'knsb')
 
 
-def update_knsb_rating(con: sqlite3.Connection) -> None:
+def update_knsb_rating(con: sqlite3.Connection, force_refresh: bool = False) -> None:
     """
     Updates the `knsb_player` table. Adds to any existing table.
     Run once a month.
     """
-    date = datetime.date.today().replace(day=1)
-    df = load_knsb_rating(date)
+    today = RatingPeriod.current()
+    if today in existing_ratings('knsb'):
+        if not force_refresh:
+            return
+        delete_player_rating(con, today)
+
+    df = load_knsb_rating(today)
     if df is None:
         return
 
     df.to_sql('knsb_rating', con, if_exists='append')
-
-    write_rating_meta(df, date, 'knsb')
+    write_rating_meta(df, today, 'knsb')

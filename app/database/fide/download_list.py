@@ -1,6 +1,6 @@
-import datetime
-
 import pandas as pd
+
+from ..meta import RatingPeriod
 
 Int = pd.Int64Dtype()
 
@@ -30,23 +30,20 @@ def read_legacy_format_players() -> pd.DataFrame:
     return players
 
 
-def read_rating_zip(url: str, date: datetime.date) -> pd.DataFrame:
+def read_rating_zip(url: str, period: RatingPeriod) -> pd.DataFrame:
     """
     Reads a FIDE rating list from fwf (fixed width format).
     """
-    if date.day != 1:
-        raise ValueError("Date must have day=1")
-
     # Since the file will be fwf (fixed width format) these are the widths it uses.
     # Pandas doesn't always recognize these properly.
     widths = [15, 61, 4, 4, 5, 5, 15, 4, 6, 4, 3, 6, 5]
 
-    rating_column = date.strftime("%b%y").upper()
+    rating_column = period.as_date().strftime("%b%y").upper()
 
     df = pd.read_fwf(url, compression='zip', na_values=['', 0], widths=widths)
     ratings = pd.DataFrame(dict(
         fide_id=df['ID Number'],
-        date=date.isoformat(),
+        date=period.isoformat(),
         title=df['Tit'],
         woman_title=df['WTit'],
         other_titles=df['OTit'],
@@ -67,11 +64,11 @@ def combine_ratings(standard: pd.DataFrame, rapid: pd.DataFrame, blitz: pd.DataF
     return sdf.combine_first(rdf).combine_first(bdf)
 
 
-def download_ratings(date: datetime.date) -> pd.DataFrame:
-    url = "http://ratings.fide.com/download/{}_" + date.strftime("%b%y").lower() + "frl.zip"
+def download_ratings(period: RatingPeriod) -> pd.DataFrame:
+    url = "http://ratings.fide.com/download/{}_" + period.as_date().strftime("%b%y").lower() + "frl.zip"
 
-    standard_df = read_rating_zip(url.format("standard"), date)
-    rapid_df = read_rating_zip(url.format("rapid"), date)
-    blitz_df = read_rating_zip(url.format("blitz"), date)
+    standard_df = read_rating_zip(url.format("standard"), period)
+    rapid_df = read_rating_zip(url.format("rapid"), period)
+    blitz_df = read_rating_zip(url.format("blitz"), period)
 
     return combine_ratings(standard_df, rapid_df, blitz_df)

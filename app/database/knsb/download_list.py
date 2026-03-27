@@ -13,13 +13,15 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
+from ..meta import RatingPeriod
+
 Int = pd.Int64Dtype()
 
 MONTHS = {'januari': 1, 'februari': 2, 'maart': 3, 'april': 4, 'mei': 5, 'juni': 6,
           'juli': 7, 'augustus': 8, 'september': 9, 'oktober': 10, 'november': 11, 'december': 12}
 
 
-def get_download_urls() -> dict[datetime.date, dict[str, str]]:
+def get_download_urls() -> dict[RatingPeriod, dict[str, str]]:
     """Scrapes the urls for the download lists from the schaakbond website.
     I would like to just infer the urls from the date, since they mostly look like
     https://schaakbond.nl/wp-content/uploads/{year}/{month}/{year}-{month}-{rating_type}.zip
@@ -28,7 +30,7 @@ def get_download_urls() -> dict[datetime.date, dict[str, str]]:
     is off by 1. I can't predict when this is, so I just scrape all urls.
 
     Returns a dict with key: value pairs like
-    `date(year, month, 1): {rating_type1: url1, rating_type2: url2}`
+    `RatingPeriod(year, month): {rating_type1: url1, rating_type2: url2}`
 
     The possible rating types are `JEUGD` and `KNSB` for old lists (up to september 2024).
     For new lists, it's `KLASSIEK`, `RAPID`, and `SNEL`.
@@ -50,7 +52,7 @@ def get_download_urls() -> dict[datetime.date, dict[str, str]]:
         year = int(text_list[-1])
         month = MONTHS[text_list[-2]]
         
-        date = datetime.date(year, month, 1)
+        date = RatingPeriod(year, month)
         if date in base_urls:
             base_urls[date][game_type] = href
         else:
@@ -119,45 +121,39 @@ def combine_rating_new(rating_lists: dict[str, pd.DataFrame]) -> pd.DataFrame:
     ), index=standard_df.index)
 
 
-def combine_rating(rating_lists: dict[str, pd.DataFrame], date: datetime.date) -> pd.DataFrame:
+def combine_rating(rating_lists: dict[str, pd.DataFrame], period: RatingPeriod) -> pd.DataFrame:
     """
     Combines the different rating lists to one list with all ratings.
     All personal information is left out, since that can be found in the player database.
     Only the knsb_id is left for identification (the index column in the returned DataFrame). 
     """
-    if date <= datetime.date(2024, 9, 1):
+    if period <= RatingPeriod(2024, 9):
         df = combine_rating_old(rating_lists)
     else:
         df = combine_rating_new(rating_lists)
 
-    df["date"] = date
+    df["date"] = period.as_date()
     return df
 
 
-def load_knsb_rating(date: datetime.date, date_urls: dict[str, str] | None = None) -> pd.DataFrame | None:
+def load_knsb_rating(period: RatingPeriod, date_urls: dict[str, str] | None = None) -> pd.DataFrame | None:
     """
     Loads the full rating list for a specific date. Note that this involves getting (scraping)
     the entire list of download urls. For loading all ratings lists, see `load_full_rating_archive`.
     """
-    if date.day != 1:
-        raise ValueError("Date must have day=1")
-
     if not date_urls:
         urls = get_download_urls()
-        date_urls = urls.get(date, None)
+        date_urls = urls.get(period, None)
         if date_urls is None:
             return
     
     rating_lists = {rating_type: read_rating_zip(url) for rating_type, url in date_urls.items()}
-    return combine_rating(rating_lists, date)
+    return combine_rating(rating_lists, period)
 
 
-def load_knsb_player(date: datetime.date) -> pd.DataFrame | None:
-    if date.day != 1:
-        raise ValueError("Date must have day=1")
-
+def load_knsb_player(period: RatingPeriod) -> pd.DataFrame | None:
     urls = get_download_urls()
-    date_urls = urls.get(date, None)
+    date_urls = urls.get(period, None)
     if date_urls is None:
         return
         
